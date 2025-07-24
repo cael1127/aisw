@@ -6,9 +6,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
-    <title>AI Chat</title>
-    <link rel="stylesheet" href="styles.css?v=14">
+    <title>Advanced AI Chat</title>
+    <link rel="stylesheet" href="styles.css?v=15">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 </head>
 <body>
     <div class="container">
@@ -17,9 +18,18 @@
                 <button class="new-chat-btn" id="newChatBtn">
                     <i class="fas fa-plus"></i> New Chat
                 </button>
+                <button class="collab-btn" id="collabBtn" title="Start Collaboration">
+                    <i class="fas fa-users"></i>
+                </button>
             </div>
             <div class="conversations-list" id="conversationsList">
                 <!-- Conversations will be populated here -->
+            </div>
+            <div class="sidebar-footer">
+                <div class="ai-status">
+                    <span class="status-indicator" id="aiStatus"></span>
+                    <span class="status-text">AI Online</span>
+                </div>
             </div>
         </div>
 
@@ -29,10 +39,15 @@
                     <button class="sidebar-toggle" id="sidebarToggle">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1><i class="fas fa-robot"></i> AI Chat</h1>
+                    <h1><i class="fas fa-robot"></i> Advanced AI Chat</h1>
                     <div class="header-controls">
                         <div class="model-selector">
-                            <span class="model-badge">Gemini 1.5 Flash</span>
+                            <select id="modelSelect" class="model-select">
+                                <option value="gemini">Gemini 1.5 Flash</option>
+                                <option value="gpt4">GPT-4 (Simulated)</option>
+                                <option value="claude">Claude (Simulated)</option>
+                                <option value="custom">Custom Model</option>
+                            </select>
                         </div>
                         <div class="conversation-controls">
                             <button class="control-button" id="voiceInput" title="Voice Input">
@@ -40,6 +55,12 @@
                             </button>
                             <button class="control-button" id="imageGen" title="Generate Image">
                                 <i class="fas fa-image"></i>
+                            </button>
+                            <button class="control-button" id="codeExec" title="Execute Code">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="control-button" id="settings" title="Settings">
+                                <i class="fas fa-cog"></i>
                             </button>
                             <button class="control-button" id="clearChat" title="Clear Conversation">
                                 <i class="fas fa-trash"></i>
@@ -61,18 +82,37 @@
                             </div>
                             <div class="message-content">
                                 <div class="message-header">
-                                    <span class="message-author">AI Assistant</span>
+                                    <span class="message-author">Advanced AI Assistant</span>
+                                    <span class="message-time" id="messageTime"></span>
                                 </div>
                                 <div class="message-text">
-                                    <p>Hello! I'm your enhanced AI assistant powered by Google Gemini. I can help you with:</p>
-                                    <ul>
-                                        <li>📝 Writing and editing content</li>
-                                        <li>💻 Programming and code analysis</li>
-                                        <li>🎨 Image generation and design</li>
-                                        <li>🔊 Voice input and transcription</li>
-                                        <li>📁 File analysis and processing</li>
-                                        <li>🧠 Problem solving and brainstorming</li>
-                                    </ul>
+                                    <p>🚀 Welcome to Advanced AI Chat! I'm your super-powered AI assistant with cutting-edge capabilities:</p>
+                                    <div class="capabilities-grid">
+                                        <div class="capability-item">
+                                            <i class="fas fa-brain"></i>
+                                            <span>Multi-Model AI</span>
+                                        </div>
+                                        <div class="capability-item">
+                                            <i class="fas fa-code"></i>
+                                            <span>Code Execution</span>
+                                        </div>
+                                        <div class="capability-item">
+                                            <i class="fas fa-users"></i>
+                                            <span>Real-time Collaboration</span>
+                                        </div>
+                                        <div class="capability-item">
+                                            <i class="fas fa-chart-line"></i>
+                                            <span>Data Analysis</span>
+                                        </div>
+                                        <div class="capability-item">
+                                            <i class="fas fa-magic"></i>
+                                            <span>AI Art Generation</span>
+                                        </div>
+                                        <div class="capability-item">
+                                            <i class="fas fa-microphone"></i>
+                                            <span>Voice Commands</span>
+                                        </div>
+                                    </div>
                                     <p>How can I assist you today?</p>
                                 </div>
                             </div>
@@ -84,7 +124,7 @@
                             <div class="input-field">
                                 <textarea 
                                     id="userInput" 
-                                    placeholder="Message AI Chat... (or drag files here)"
+                                    placeholder="Message Advanced AI... (or drag files here)"
                                     rows="1"
                                 ></textarea>
                                 <div class="input-actions">
@@ -94,14 +134,20 @@
                                     <button class="action-btn" id="voiceBtn" title="Voice Input">
                                         <i class="fas fa-microphone"></i>
                                     </button>
+                                    <button class="action-btn" id="codeBtn" title="Code Mode">
+                                        <i class="fas fa-code"></i>
+                                    </button>
+                                    <button class="action-btn" id="dataBtn" title="Data Analysis">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </button>
                                     <button id="sendButton" class="send-button">
                                         <i class="fas fa-paper-plane"></i>
                                     </button>
                                 </div>
                             </div>
-                            <input type="file" id="fileInput" multiple accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" style="display: none;">
+                            <input type="file" id="fileInput" multiple accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.csv,.json,.xml" style="display: none;">
                             <div class="input-footer">
-                                <span class="input-hint">AI Chat can make mistakes. Consider checking important information.</span>
+                                <span class="input-hint">Advanced AI can make mistakes. Consider checking important information.</span>
                                 <div class="input-stats" id="inputStats"></div>
                             </div>
                         </div>
@@ -156,6 +202,8 @@
                             <option value="artistic">Artistic</option>
                             <option value="cartoon">Cartoon</option>
                             <option value="abstract">Abstract</option>
+                            <option value="anime">Anime</option>
+                            <option value="photorealistic">Photorealistic</option>
                         </select>
                         <select id="imageSize">
                             <option value="1024x1024">Square (1024x1024)</option>
@@ -172,6 +220,164 @@
         </div>
     </div>
 
-    <script src="script.js?v=14"></script>
+    <!-- Code Execution Modal -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-code"></i> Code Execution</h3>
+                <button class="close-btn" id="closeCodeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="code-form">
+                    <div class="code-language-selector">
+                        <select id="codeLanguage">
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="sql">SQL</option>
+                            <option value="bash">Bash</option>
+                        </select>
+                    </div>
+                    <textarea 
+                        id="codeInput" 
+                        placeholder="Enter your code here..."
+                        rows="10"
+                    ></textarea>
+                    <div class="code-controls">
+                        <button class="code-btn" id="runCode">
+                            <i class="fas fa-play"></i> Run Code
+                        </button>
+                        <button class="code-btn" id="formatCode">
+                            <i class="fas fa-magic"></i> Format
+                        </button>
+                        <button class="code-btn" id="clearCode">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="code-output" id="codeOutput">
+                    <div class="output-header">
+                        <span>Output</span>
+                        <button class="clear-output" id="clearOutput">Clear</button>
+                    </div>
+                    <div class="output-content" id="outputContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Settings</h3>
+                <button class="close-btn" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>AI Configuration</h4>
+                    <div class="setting-item">
+                        <label>Default Model:</label>
+                        <select id="defaultModel">
+                            <option value="gemini">Gemini 1.5 Flash</option>
+                            <option value="gpt4">GPT-4</option>
+                            <option value="claude">Claude</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Response Length:</label>
+                        <select id="responseLength">
+                            <option value="short">Short</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="long">Long</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Creativity Level:</label>
+                        <input type="range" id="creativityLevel" min="0" max="100" value="70">
+                        <span id="creativityValue">70%</span>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h4>Interface</h4>
+                    <div class="setting-item">
+                        <label>Theme:</label>
+                        <select id="themeSelect">
+                            <option value="dark" selected>Dark</option>
+                            <option value="light">Light</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Font Size:</label>
+                        <select id="fontSize">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h4>Advanced</h4>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="autoSave" checked>
+                            Auto-save conversations
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="voiceEnabled" checked>
+                            Enable voice input
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="codeExecution" checked>
+                            Enable code execution
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collaboration Modal -->
+    <div class="modal" id="collabModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-users"></i> Real-time Collaboration</h3>
+                <button class="close-btn" id="closeCollabModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="collab-form">
+                    <div class="collab-section">
+                        <h4>Create Session</h4>
+                        <button class="collab-btn primary" id="createSession">
+                            <i class="fas fa-plus"></i> New Session
+                        </button>
+                    </div>
+                    <div class="collab-section">
+                        <h4>Join Session</h4>
+                        <input type="text" id="sessionCode" placeholder="Enter session code">
+                        <button class="collab-btn" id="joinSession">
+                            <i class="fas fa-sign-in-alt"></i> Join
+                        </button>
+                    </div>
+                    <div class="collab-section">
+                        <h4>Active Sessions</h4>
+                        <div class="sessions-list" id="sessionsList">
+                            <p class="no-sessions">No active sessions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="script.js?v=15"></script>
 </body>
 </html> 
