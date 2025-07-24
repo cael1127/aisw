@@ -441,7 +441,7 @@ class AIChat {
         } catch (error) {
             console.error('Error sending message:', error);
             this.hideEnhancedLoadingIndicator();
-            this.addErrorMessage('Sorry, I encountered an error. Please check your API connection and try again.');
+            this.addErrorMessage('Sorry, I encountered an error. Please check that your API keys are configured in Netlify environment variables (QWEN_API_KEY and QWEN2_API_KEY).');
             this.updateConnectionStatus('error');
             
             // Play error sound if enabled
@@ -630,51 +630,36 @@ class AIChat {
 
     updateConnectionStatus(status) {
         const statusElement = this.connectionStatus;
-        statusElement.className = `status-indicator ${status}`;
+        
+        switch (status) {
+            case 'connected':
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Connected';
+                statusElement.className = 'status-indicator connected';
+                break;
+            case 'connecting':
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Connecting...';
+                statusElement.className = 'status-indicator connecting';
+                break;
+            case 'error':
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Connection Error';
+                statusElement.className = 'status-indicator error';
+                break;
+            default:
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Ready';
+                statusElement.className = 'status-indicator connected';
+        }
         
         // Animate status change
         statusElement.style.transform = 'scale(1.1)';
         setTimeout(() => {
             statusElement.style.transform = 'scale(1)';
         }, 200);
-        
-        switch (status) {
-            case 'connected':
-                statusElement.innerHTML = '<i class="fas fa-circle"></i> Connected';
-                break;
-            case 'error':
-                statusElement.innerHTML = '<i class="fas fa-circle"></i> Connection Error';
-                break;
-            default:
-                statusElement.innerHTML = '<i class="fas fa-circle"></i> Connecting...';
-        }
     }
 
     async checkConnection() {
-        try {
-            // Use Netlify function for secure connection check
-            const response = await fetch('/.netlify/functions/api-proxy', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    endpoint: this.settings.apiEndpoint,
-                    model: this.settings.model,
-                    messages: [{ role: 'user', content: 'test' }],
-                    temperature: 0.1,
-                    max_tokens: 10
-                })
-            });
-            
-            if (response.ok) {
-                this.updateConnectionStatus('connected');
-            } else {
-                this.updateConnectionStatus('error');
-            }
-        } catch (error) {
-            this.updateConnectionStatus('error');
-        }
+        // Since we're using Netlify functions and API keys are server-side,
+        // we'll assume connection is available and let actual requests handle errors
+        this.updateConnectionStatus('connected');
     }
 
     // Enhanced Voice Input
