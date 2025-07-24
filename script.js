@@ -1,34 +1,3 @@
-// Immediate cache-busting check
-(function() {
-    // Check if we're loading from cache
-    if (performance.navigation.type === 1) {
-        // This is a reload, force fresh content
-        const url = new URL(window.location);
-        url.searchParams.set('v', Date.now());
-        if (!url.searchParams.has('fresh')) {
-            url.searchParams.set('fresh', '1');
-            window.location.replace(url.toString());
-        }
-    }
-    
-    // Check for old content immediately
-    const oldContent = document.querySelector('.message-content p');
-    if (oldContent && oldContent.textContent.includes('Choose an API above')) {
-        window.location.reload(true);
-        return;
-    }
-    
-    // Check for old API options
-    const apiSelector = document.getElementById('apiSelector');
-    if (apiSelector) {
-        const options = Array.from(apiSelector.options).map(opt => opt.value);
-        if (options.includes('qwen') || options.includes('qwen2')) {
-            window.location.reload(true);
-            return;
-        }
-    }
-})();
-
 class ChatApp {
     constructor() {
         this.messages = [];
@@ -39,19 +8,17 @@ class ChatApp {
     }
 
     checkForOldContent() {
-        // Check if old content is being displayed (indicating cache issues)
+        // Simple check for old content without forcing reloads
         const messagesContainer = document.getElementById('messages');
         if (!messagesContainer) {
-            console.log('Messages container not found, forcing reload...');
-            window.location.reload(true);
+            console.log('Messages container not found');
             return;
         }
 
         // Check if we're showing the old welcome message
         const welcomeMessage = messagesContainer.querySelector('.message-content p');
         if (welcomeMessage && welcomeMessage.textContent.includes('Choose an API above')) {
-            console.log('Old welcome message detected, forcing reload...');
-            window.location.reload(true);
+            console.log('Old welcome message detected - please refresh the page');
             return;
         }
 
@@ -60,8 +27,7 @@ class ChatApp {
         if (apiSelector) {
             const options = Array.from(apiSelector.options).map(opt => opt.value);
             if (options.includes('qwen') || options.includes('qwen2')) {
-                console.log('Old API options detected, forcing reload...');
-                window.location.reload(true);
+                console.log('Old API options detected - please refresh the page');
                 return;
             }
         }

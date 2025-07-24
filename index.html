@@ -6,9 +6,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
-    <meta http-equiv="Last-Modified" content="Mon, 01 Jan 2024 00:00:00 GMT">
     <title>AI Chat</title>
-    <link rel="stylesheet" href="styles.css?v=5&t=20250101">
+    <link rel="stylesheet" href="styles.css?v=6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -46,18 +45,6 @@
         </main>
     </div>
 
-    <script>
-        // Force reload if this is a cached version
-        if (performance.navigation.type === 1) {
-            // This is a reload, check if we need to force a fresh reload
-            const lastLoad = sessionStorage.getItem('lastLoad');
-            const now = Date.now();
-            if (!lastLoad || (now - parseInt(lastLoad)) > 30000) { // 30 seconds
-                sessionStorage.setItem('lastLoad', now);
-                window.location.reload(true);
-            }
-        }
-    </script>
-    <script src="script.js?v=5&t=20250101"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html> 
