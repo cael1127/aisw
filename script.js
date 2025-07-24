@@ -304,7 +304,7 @@ class ChatApp {
         this.userInput.style.height = Math.min(this.userInput.scrollHeight, 200) + 'px';
     }
 
-    // Enhanced message display function
+    // Enhanced message display function with better formatting
     displayMessage(type, content, shouldSave = true) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}`;
@@ -333,17 +333,12 @@ class ChatApp {
         
         headerDiv.appendChild(authorSpan);
         
-        // Create message text
+        // Create message text with enhanced formatting
         const textDiv = document.createElement('div');
         textDiv.className = 'message-text';
         
-        // Format the content with proper line breaks
-        const formattedContent = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-            .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic text
-            .replace(/\n/g, '<br>') // Line breaks
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Handle any remaining bold
-        
+        // Enhanced formatting with better code detection and markdown
+        const formattedContent = this.enhanceMessageFormatting(content);
         textDiv.innerHTML = formattedContent;
         
         // Assemble message
@@ -356,6 +351,43 @@ class ChatApp {
         this.messagesContainer.appendChild(messageDiv);
         
         this.scrollToBottom();
+        
+        // Add subtle animation for new messages
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            messageDiv.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            messageDiv.style.opacity = '1';
+            messageDiv.style.transform = 'translateY(0)';
+        }, 10);
+    }
+
+    // Enhanced message formatting function
+    enhanceMessageFormatting(content) {
+        return content
+            // Bold text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            // Italic text
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            // Code blocks (```code```)
+            .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="code-block"><code class="language-$1">$2</code></pre>')
+            // Inline code (`code`)
+            .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+            // Headers (# Header)
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+            // Lists
+            .replace(/^\* (.*$)/gm, '<li>$1</li>')
+            .replace(/^- (.*$)/gm, '<li>$1</li>')
+            // Wrap lists in ul tags
+            .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+            // Line breaks
+            .replace(/\n/g, '<br>')
+            // Links [text](url)
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+            // Clean up multiple line breaks
+            .replace(/<br><br><br>/g, '<br><br>');
     }
 
     async sendMessage() {
@@ -395,13 +427,24 @@ class ChatApp {
     }
 
     async callAPI(message) {
-        // Build context from recent messages (last 10 messages for context)
-        const recentMessages = this.messages.slice(-10);
+        // Build enhanced context from recent messages (last 15 messages for better context)
+        const recentMessages = this.messages.slice(-15);
         const context = recentMessages.map(msg => 
             `${msg.type === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
         ).join('\n');
         
-        const fullMessage = context ? `${context}\n\nUser: ${message}` : message;
+        // Add conversation metadata for better AI understanding
+        const conversationMetadata = `
+Conversation Context:
+- Total messages: ${this.messages.length}
+- Current conversation ID: ${this.conversationId}
+- User's message count: ${this.messages.filter(m => m.type === 'user').length}
+- AI's response count: ${this.messages.filter(m => m.type === 'assistant').length}
+        `.trim();
+        
+        const fullMessage = context ? 
+            `${conversationMetadata}\n\nPrevious Conversation:\n${context}\n\nCurrent User Message: ${message}` : 
+            `${conversationMetadata}\n\nUser Message: ${message}`;
 
         const response = await fetch('/.netlify/functions/api-proxy', {
             method: 'POST',

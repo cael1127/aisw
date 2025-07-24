@@ -311,6 +311,85 @@ body {
     margin-bottom: 0;
 }
 
+/* Enhanced formatting styles */
+.message-text h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem 0;
+    color: #ececf1;
+}
+
+.message-text h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0.8rem 0 0.4rem 0;
+    color: #ececf1;
+}
+
+.message-text h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0.6rem 0 0.3rem 0;
+    color: #ececf1;
+}
+
+.message-text ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.message-text li {
+    margin-bottom: 0.25rem;
+}
+
+.message-text .code-block {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.message-text .code-block code {
+    color: #d4d4d4;
+    background: none;
+    padding: 0;
+}
+
+.message-text .inline-code {
+    background: #2d2d30;
+    color: #d4d4d4;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.message-text a {
+    color: #19c37d;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.message-text a:hover {
+    border-bottom-color: #19c37d;
+}
+
+.message-text strong {
+    font-weight: 600;
+    color: #ececf1;
+}
+
+.message-text em {
+    font-style: italic;
+    color: #b0b0b0;
+}
+
 .input-container {
     background: #343541;
     border-top: 1px solid #4a4b53;
