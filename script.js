@@ -37,8 +37,6 @@ class ChatApp {
         this.messagesContainer = document.getElementById('messages');
         this.userInput = document.getElementById('userInput');
         this.sendButton = document.getElementById('sendButton');
-        this.apiSelector = document.getElementById('apiSelector');
-        this.copyCodeButton = document.getElementById('copyCode');
     }
 
     initializeEventListeners() {
@@ -50,85 +48,15 @@ class ChatApp {
             }
         });
 
-        // Tab functionality
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', () => this.switchTab(button.dataset.tab));
-        });
-
-        // Quick actions
-        document.querySelectorAll('.quick-action').forEach(button => {
-            button.addEventListener('click', () => this.handleQuickAction(button.dataset.action));
-        });
-
-        // Copy code functionality
-        if (this.copyCodeButton) {
-            this.copyCodeButton.addEventListener('click', () => this.copyCode());
-        }
-    }
-
-    switchTab(tabName) {
-        // Update tab buttons
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.classList.toggle('active', button.dataset.tab === tabName);
-        });
-
-        // Update tab content
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.toggle('active', content.id === `${tabName}-tab`);
+        // Auto-resize textarea
+        this.userInput.addEventListener('input', () => {
+            this.autoResizeTextarea();
         });
     }
 
-    handleQuickAction(action) {
-        switch (action) {
-            case 'clear':
-                this.clearChat();
-                break;
-            case 'export':
-                this.exportChat();
-                break;
-        }
-    }
-
-    clearChat() {
-        if (confirm('Are you sure you want to clear the chat?')) {
-            this.messagesContainer.innerHTML = `
-                <div class="message system">
-                    <div class="message-content">
-                        <p>Chat cleared! Start a new conversation.</p>
-                    </div>
-                </div>
-            `;
-            this.messages = [];
-        }
-    }
-
-    exportChat() {
-        const chatText = this.messages.map(msg => 
-            `${msg.role.toUpperCase()}: ${msg.content}`
-        ).join('\n\n');
-        
-        const blob = new Blob([chatText], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `chat-export-${new Date().toISOString().split('T')[0]}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    copyCode() {
-        const codeBlock = document.getElementById('codeBlock');
-        if (codeBlock) {
-            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
-                const originalText = this.copyCodeButton.innerHTML;
-                this.copyCodeButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => {
-                    this.copyCodeButton.innerHTML = originalText;
-                }, 2000);
-            }).catch(() => {
-                alert('Failed to copy code to clipboard');
-            });
-        }
+    autoResizeTextarea() {
+        this.userInput.style.height = 'auto';
+        this.userInput.style.height = Math.min(this.userInput.scrollHeight, 200) + 'px';
     }
 
     async sendMessage() {
@@ -138,6 +66,7 @@ class ChatApp {
         // Add user message
         this.addMessage('user', message);
         this.userInput.value = '';
+        this.autoResizeTextarea();
 
         // Show typing indicator
         this.showTyping();
@@ -183,8 +112,33 @@ class ChatApp {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}`;
         
+        // Create avatar
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'message-avatar';
+        
+        if (type === 'user') {
+            avatarDiv.innerHTML = '<i class="fas fa-user"></i>';
+        } else {
+            avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+        }
+        
+        // Create message content
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
+        
+        // Create message header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'message-header';
+        
+        const authorSpan = document.createElement('span');
+        authorSpan.className = 'message-author';
+        authorSpan.textContent = type === 'user' ? 'You' : 'AI Assistant';
+        
+        headerDiv.appendChild(authorSpan);
+        
+        // Create message text
+        const textDiv = document.createElement('div');
+        textDiv.className = 'message-text';
         
         // Format the content with proper line breaks
         const formattedContent = content
@@ -193,9 +147,15 @@ class ChatApp {
             .replace(/\n/g, '<br>') // Line breaks
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Handle any remaining bold
         
-        contentDiv.innerHTML = formattedContent;
+        textDiv.innerHTML = formattedContent;
         
+        // Assemble message
+        contentDiv.appendChild(headerDiv);
+        contentDiv.appendChild(textDiv);
+        
+        messageDiv.appendChild(avatarDiv);
         messageDiv.appendChild(contentDiv);
+        
         this.messagesContainer.appendChild(messageDiv);
         
         this.scrollToBottom();
@@ -209,11 +169,31 @@ class ChatApp {
         typingDiv.className = 'message assistant typing';
         typingDiv.id = 'typing-indicator';
         
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'message-avatar';
+        avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+        
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.innerHTML = '<span></span><span></span><span></span>';
         
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'message-header';
+        
+        const authorSpan = document.createElement('span');
+        authorSpan.className = 'message-author';
+        authorSpan.textContent = 'AI Assistant';
+        
+        const textDiv = document.createElement('div');
+        textDiv.className = 'message-text';
+        textDiv.innerHTML = '<span></span><span></span><span></span>';
+        
+        headerDiv.appendChild(authorSpan);
+        contentDiv.appendChild(headerDiv);
+        contentDiv.appendChild(textDiv);
+        
+        typingDiv.appendChild(avatarDiv);
         typingDiv.appendChild(contentDiv);
+        
         this.messagesContainer.appendChild(typingDiv);
         
         this.scrollToBottom();

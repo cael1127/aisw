@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     <title>AI Chat</title>
-    <link rel="stylesheet" href="styles.css?v=10">
+    <link rel="stylesheet" href="styles.css?v=11">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -15,114 +15,51 @@
         <header class="header">
             <div class="header-content">
                 <h1><i class="fas fa-robot"></i> AI Chat</h1>
-                <div class="api-selector">
-                    <select id="apiSelector">
-                        <option value="gemini">Gemini 1.5 Flash</option>
-                    </select>
+                <div class="model-selector">
+                    <span class="model-badge">Gemini 1.5 Flash</span>
                 </div>
             </div>
         </header>
 
         <main class="main-content">
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-cog"></i> Settings</h3>
-                    <div class="setting-item">
-                        <label>Model:</label>
-                        <span class="model-badge">Gemini 1.5 Flash</span>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-lightbulb"></i> Quick Actions</h3>
-                    <div class="quick-actions">
-                        <button class="quick-action" data-action="clear">Clear Chat</button>
-                        <button class="quick-action" data-action="export">Export Chat</button>
-                    </div>
-                </div>
-            </div>
-
             <div class="chat-container">
-                <div class="chat-header">
-                    <div class="chat-tabs">
-                        <button class="tab-button active" data-tab="chat">
-                            <i class="fas fa-comments"></i> Chat
-                        </button>
-                        <button class="tab-button" data-tab="code">
-                            <i class="fas fa-code"></i> Code
-                        </button>
-                    </div>
-                </div>
-
-                <div class="tab-content active" id="chat-tab">
-                    <div class="messages" id="messages">
-                        <div class="message system">
-                            <div class="message-content">
-                                <p>Hello! I'm your AI assistant powered by Google Gemini. Start chatting!</p>
+                <div class="messages" id="messages">
+                    <div class="message system">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-author">AI Assistant</span>
+                            </div>
+                            <div class="message-text">
+                                <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="input-area">
-                        <div class="input-wrapper">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <div class="input-field">
                             <textarea 
                                 id="userInput" 
-                                placeholder="Type your message here..."
-                                rows="3"
+                                placeholder="Message AI Chat..."
+                                rows="1"
                             ></textarea>
-                            <button id="sendButton">
+                            <button id="sendButton" class="send-button">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="code-tab">
-                    <div class="code-editor">
-                        <div class="editor-header">
-                            <span class="language-badge">Java</span>
-                            <button class="copy-button" id="copyCode">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
+                        <div class="input-footer">
+                            <span class="input-hint">AI Chat can make mistakes. Consider checking important information.</span>
                         </div>
-                        <pre class="code-block" id="codeBlock">
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public class ExtractNumbersFromFile {
-    public static void main(String[] args) {
-        String filename = "data.txt"; // Replace with your data file name
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-            Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?"); // Matches integers and decimals
-            
-            while ((line = br.readLine()) != null) {
-                Matcher matcher = pattern.matcher(line);
-                while (matcher.find()) {
-                    String numberString = matcher.group();
-                    try {
-                        double number = Double.parseDouble(numberString);
-                        System.out.println(number);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Warning: Could not parse '" + numberString + "' as a number. Skipping.");
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-        }
-    }
-}</pre>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <script src="script.js?v=10"></script>
+    <script src="script.js?v=11"></script>
 </body>
 </html> 
