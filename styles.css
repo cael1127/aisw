@@ -42,6 +42,12 @@ body {
     font-weight: 600;
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .model-selector {
     display: flex;
     align-items: center;
@@ -55,6 +61,35 @@ body {
     font-size: 0.8rem;
     font-weight: 500;
     border: 1px solid #565869;
+}
+
+.conversation-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.control-button {
+    background: #40414f;
+    color: #ececf1;
+    border: 1px solid #565869;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.8rem;
+}
+
+.control-button:hover {
+    background: #565869;
+    border-color: #6b7280;
+}
+
+.control-button:active {
+    transform: scale(0.95);
 }
 
 .main-content {

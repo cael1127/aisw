@@ -2,9 +2,15 @@ class ChatApp {
     constructor() {
         this.messages = [];
         this.isLoading = false;
+        this.conversationId = this.generateConversationId();
         this.initializeElements();
         this.initializeEventListeners();
+        this.loadConversationHistory();
         this.checkForOldContent();
+    }
+
+    generateConversationId() {
+        return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     checkForOldContent() {
@@ -37,6 +43,8 @@ class ChatApp {
         this.messagesContainer = document.getElementById('messages');
         this.userInput = document.getElementById('userInput');
         this.sendButton = document.getElementById('sendButton');
+        this.clearChatButton = document.getElementById('clearChat');
+        this.exportChatButton = document.getElementById('exportChat');
     }
 
     initializeEventListeners() {
@@ -52,6 +60,14 @@ class ChatApp {
         this.userInput.addEventListener('input', () => {
             this.autoResizeTextarea();
         });
+
+        // Conversation controls
+        if (this.clearChatButton) {
+            this.clearChatButton.addEventListener('click', () => this.clearCurrentConversation());
+        }
+        if (this.exportChatButton) {
+            this.exportChatButton.addEventListener('click', () => this.exportConversation());
+        }
     }
 
     autoResizeTextarea() {
@@ -59,56 +75,73 @@ class ChatApp {
         this.userInput.style.height = Math.min(this.userInput.scrollHeight, 200) + 'px';
     }
 
-    async sendMessage() {
-        const message = this.userInput.value.trim();
-        if (!message || this.isLoading) return;
+    // Memory Management Functions
+    saveConversationHistory() {
+        const conversationData = {
+            id: this.conversationId,
+            timestamp: Date.now(),
+            messages: this.messages,
+            title: this.generateConversationTitle()
+        };
 
-        // Add user message
-        this.addMessage('user', message);
-        this.userInput.value = '';
-        this.autoResizeTextarea();
+        // Save to localStorage
+        const conversations = this.getStoredConversations();
+        conversations[this.conversationId] = conversationData;
+        
+        // Keep only last 10 conversations to prevent storage bloat
+        const conversationIds = Object.keys(conversations);
+        if (conversationIds.length > 10) {
+            const oldestId = conversationIds.sort((a, b) => 
+                conversations[a].timestamp - conversations[b].timestamp
+            )[0];
+            delete conversations[oldestId];
+        }
 
-        // Show typing indicator
-        this.showTyping();
+        localStorage.setItem('ai_chat_conversations', JSON.stringify(conversations));
+    }
 
+    loadConversationHistory() {
+        const conversations = this.getStoredConversations();
+        const currentConversation = conversations[this.conversationId];
+        
+        if (currentConversation && currentConversation.messages.length > 0) {
+            this.messages = currentConversation.messages;
+            this.displayStoredMessages();
+        }
+    }
+
+    getStoredConversations() {
         try {
-            const response = await this.callAPI(message);
-            this.hideTyping();
-            this.addMessage('assistant', response);
+            const stored = localStorage.getItem('ai_chat_conversations');
+            return stored ? JSON.parse(stored) : {};
         } catch (error) {
-            this.hideTyping();
-            this.addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
-            console.error('API Error:', error);
+            console.error('Error loading conversations:', error);
+            return {};
         }
     }
 
-    async callAPI(message) {
-        const response = await fetch('/.netlify/functions/api-proxy', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                apiType: 'gemini'
-            })
+    displayStoredMessages() {
+        // Clear existing messages
+        this.messagesContainer.innerHTML = '';
+        
+        // Display all stored messages
+        this.messages.forEach(msg => {
+            this.displayMessage(msg.type, msg.content, false); // false = don't save again
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        return data.response || 'No response received';
     }
 
-    addMessage(type, content) {
+    generateConversationTitle() {
+        // Generate a title based on the first user message
+        const firstUserMessage = this.messages.find(msg => msg.type === 'user');
+        if (firstUserMessage) {
+            const content = firstUserMessage.content;
+            return content.length > 50 ? content.substring(0, 50) + '...' : content;
+        }
+        return 'New Conversation';
+    }
+
+    // Enhanced message display function
+    displayMessage(type, content, shouldSave = true) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}`;
         
@@ -161,6 +194,73 @@ class ChatApp {
         this.scrollToBottom();
     }
 
+    async sendMessage() {
+        const message = this.userInput.value.trim();
+        if (!message || this.isLoading) return;
+
+        // Add user message to memory
+        this.messages.push({ type: 'user', content: message, timestamp: Date.now() });
+        this.displayMessage('user', message);
+        this.saveConversationHistory();
+
+        this.userInput.value = '';
+        this.autoResizeTextarea();
+
+        // Show typing indicator
+        this.showTyping();
+
+        try {
+            const response = await this.callAPI(message);
+            this.hideTyping();
+            
+            // Add AI response to memory
+            this.messages.push({ type: 'assistant', content: response, timestamp: Date.now() });
+            this.displayMessage('assistant', response);
+            this.saveConversationHistory();
+        } catch (error) {
+            this.hideTyping();
+            const errorMessage = 'Sorry, I encountered an error. Please try again.';
+            this.messages.push({ type: 'assistant', content: errorMessage, timestamp: Date.now() });
+            this.displayMessage('assistant', errorMessage);
+            this.saveConversationHistory();
+            console.error('API Error:', error);
+        }
+    }
+
+    async callAPI(message) {
+        // Build context from recent messages (last 10 messages for context)
+        const recentMessages = this.messages.slice(-10);
+        const context = recentMessages.map(msg => 
+            `${msg.type === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
+        ).join('\n');
+        
+        const fullMessage = context ? `${context}\n\nUser: ${message}` : message;
+
+        const response = await fetch('/.netlify/functions/api-proxy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: fullMessage,
+                apiType: 'gemini'
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        return data.response || 'No response received';
+    }
+
     showTyping() {
         this.isLoading = true;
         this.sendButton.disabled = true;
@@ -211,6 +311,44 @@ class ChatApp {
 
     scrollToBottom() {
         this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    }
+
+    // Memory utility functions
+    clearCurrentConversation() {
+        if (confirm('Are you sure you want to clear this conversation?')) {
+            this.messages = [];
+            this.conversationId = this.generateConversationId();
+            this.messagesContainer.innerHTML = `
+                <div class="message system">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">AI Assistant</span>
+                        </div>
+                        <div class="message-text">
+                            <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            this.saveConversationHistory();
+        }
+    }
+
+    exportConversation() {
+        const conversationText = this.messages.map(msg => 
+            `${msg.type === 'user' ? 'You' : 'AI Assistant'}: ${msg.content}`
+        ).join('\n\n');
+        
+        const blob = new Blob([conversationText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `conversation-${new Date().toISOString().split('T')[0]}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 }
 

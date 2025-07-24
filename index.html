@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     <title>AI Chat</title>
-    <link rel="stylesheet" href="styles.css?v=11">
+    <link rel="stylesheet" href="styles.css?v=12">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -15,8 +15,18 @@
         <header class="header">
             <div class="header-content">
                 <h1><i class="fas fa-robot"></i> AI Chat</h1>
-                <div class="model-selector">
-                    <span class="model-badge">Gemini 1.5 Flash</span>
+                <div class="header-controls">
+                    <div class="model-selector">
+                        <span class="model-badge">Gemini 1.5 Flash</span>
+                    </div>
+                    <div class="conversation-controls">
+                        <button class="control-button" id="clearChat" title="Clear Conversation">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="control-button" id="exportChat" title="Export Conversation">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -60,6 +70,6 @@
         </main>
     </div>
 
-    <script src="script.js?v=11"></script>
+    <script src="script.js?v=12"></script>
 </body>
 </html> 
