@@ -60,10 +60,10 @@ class AIChat {
         
         // Default settings
         this.settings = {
-            modelType: 'qwen',
-            apiEndpoint: 'https://api.deepseek.com/v1/chat/completions',
-            model: 'qwen2.5-72b-instruct',
-            temperature: 0.7,
+            modelType: 'deepseek',
+            apiEndpoint: 'http://localhost:8000/v1/chat/completions',
+            model: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
+            temperature: 0.6,
             maxLength: 32768,
             apiKey: '',
             theme: 'light',
@@ -80,7 +80,8 @@ class AIChat {
                     'deepseek-ai/DeepSeek-R1-Distill-Llama-32B'
                 ],
                 defaultModel: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
-                temperatureRange: { min: 0.5, max: 0.7, default: 0.6 }
+                temperatureRange: { min: 0.5, max: 0.7, default: 0.6 },
+                description: 'Local DeepSeek-R1-Distill models (vLLM/SGLang)'
             },
             qwen: {
                 endpoint: 'https://api.deepseek.com/v1/chat/completions',
@@ -95,7 +96,8 @@ class AIChat {
                     'qwen2-7b-instruct'
                 ],
                 defaultModel: 'qwen2.5-72b-instruct',
-                temperatureRange: { min: 0.1, max: 1.0, default: 0.7 }
+                temperatureRange: { min: 0.1, max: 1.0, default: 0.7 },
+                description: 'Qwen models via DeepSeek API'
             }
         };
     }
@@ -536,7 +538,7 @@ class AIChat {
     }
 
     formatDeepSeekPrompt(message) {
-        // Following DeepSeek-R1-Distill guidelines
+        // Following DeepSeek-R1-Distill official guidelines
         let formattedMessage = message;
         
         // Check if it's a math problem
@@ -549,7 +551,8 @@ class AIChat {
             formattedMessage = `Please reason step by step, and put your final answer within \\boxed{}.\n\n${message}`;
         }
         
-        // Force thinking pattern for DeepSeek
+        // Force thinking pattern for DeepSeek-R1-Distill (official recommendation)
+        // This ensures the model engages in thorough reasoning
         formattedMessage = `<think>\n${formattedMessage}`;
         
         return formattedMessage;

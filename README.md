@@ -1,9 +1,10 @@
-# AI Chat Interface - Qwen Models
+# AI Chat Interface - DeepSeek-R1-Distill & Qwen Models
 
-A professional, modern AI chat interface supporting Qwen models through the DeepSeek API with beautiful animations, glassmorphism design, and secure API handling.
+A professional, modern AI chat interface supporting DeepSeek-R1-Distill models locally and Qwen models via API with beautiful animations, glassmorphism design, and secure API handling.
 
 ## 🚀 Features
 
+- **DeepSeek-R1-Distill Support**: Run models locally with vLLM or SGLang
 - **Qwen Model Support**: Access to all Qwen models via DeepSeek API
 - **Professional Design**: Glassmorphism effects with smooth animations
 - **Secure API Handling**: Serverless functions for secure API key management
@@ -17,16 +18,42 @@ A professional, modern AI chat interface supporting Qwen models through the Deep
 
 ## 🔧 Setup Instructions
 
-### 1. Deploy to Netlify
+### 1. Local DeepSeek-R1-Distill Setup
+
+#### Option A: Using vLLM
+```bash
+# Install vLLM
+pip install vllm
+
+# Start DeepSeek-R1-Distill-Qwen-32B server
+vllm serve deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
+    --tensor-parallel-size 2 \
+    --max-model-len 32768 \
+    --enforce-eager
+```
+
+#### Option B: Using SGLang
+```bash
+# Install SGLang
+pip install sglang
+
+# Start DeepSeek-R1-Distill-Qwen-32B server
+python3 -m sglang.launch_server \
+    --model deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
+    --trust-remote-code \
+    --tp 2
+```
+
+### 2. Deploy to Netlify
 
 1. **Connect Repository**:
    - Go to [Netlify](https://netlify.com)
    - Click "New site from Git"
    - Connect your GitHub repository: `cael1127/aisw`
 
-2. **Set Environment Variables**:
+2. **Set Environment Variables** (for Qwen API):
    - In your Netlify dashboard, go to **Site settings** → **Environment variables**
-   - Add the following variable:
+   - Add the following variable (only needed for Qwen models):
      ```
      QWEN_API_KEY=your_qwen_api_key_here
      ```
@@ -35,7 +62,7 @@ A professional, modern AI chat interface supporting Qwen models through the Deep
    - Netlify will automatically deploy your site
    - Your AI chat interface will be live!
 
-### 2. Local Development
+### 3. Local Development
 
 1. **Clone the repository**:
    ```bash
@@ -48,7 +75,7 @@ A professional, modern AI chat interface supporting Qwen models through the Deep
    npm install
    ```
 
-3. **Set up environment variables**:
+3. **Set up environment variables** (optional):
    Create a `.env` file in the root directory:
    ```
    QWEN_API_KEY=your_qwen_api_key_here
@@ -93,30 +120,32 @@ A professional, modern AI chat interface supporting Qwen models through the Deep
 
 ### Model Settings
 
+#### DeepSeek-R1-Distill Models (Local)
+- **Endpoint**: `http://localhost:8000/v1/chat/completions`
+- **Models**: DeepSeek-R1-Distill-Qwen-32B, DeepSeek-R1-Distill-Llama-32B
+- **Temperature**: 0.5-0.7 (0.6 recommended)
+- **Features**: Step-by-step reasoning, mathematical problem solving
+- **Server**: vLLM or SGLang required
+
 #### Qwen Models (DeepSeek API)
 - **Endpoint**: `https://api.deepseek.com/v1/chat/completions`
 - **Models**: Qwen2.5-72B, Qwen2.5-32B, Qwen2.5-14B, Qwen2.5-7B, Qwen2-72B, Qwen2-32B, Qwen2-14B, Qwen2-7B
-- **Temperature**: 0.1-1.0 (recommended: 0.7)
+- **Temperature**: 0.1-1.0 (0.7 recommended)
 - **Features**: Advanced Qwen model capabilities with system prompts
 
-#### DeepSeek Models (Local - Optional)
-- **Endpoint**: `http://localhost:8000/v1/chat/completions`
-- **Models**: DeepSeek-R1-Distill-Qwen-32B, DeepSeek-R1-Distill-Llama-32B
-- **Temperature**: 0.5-0.7 (recommended: 0.6)
-- **Features**: Step-by-step reasoning, mathematical problem solving
-
 ### Usage Guidelines
+
+#### DeepSeek-R1-Distill Models (Official Guidelines):
+- **Temperature**: 0.5-0.7 (0.6 recommended) to prevent endless repetitions
+- **No System Prompts**: Avoid adding system prompts; all instructions in user prompt
+- **Math Problems**: Include "Please reason step by step, and put your final answer within \\boxed{}."
+- **Thinking Pattern**: Automatically enforced with `<think>\n` at the beginning
+- **Multiple Tests**: Recommended for evaluation and averaging results
 
 #### Qwen Models:
 - **System Prompts**: Include helpful system messages
 - **Temperature**: Flexible range from 0.1-1.0
 - **Step-by-step**: Models naturally provide detailed explanations
-
-#### DeepSeek Models (Local):
-- **No System Prompts**: DeepSeek models don't require system prompts
-- **Thinking Patterns**: Use `<think>` tags for step-by-step reasoning
-- **Math Problems**: Use `\boxed{}` format for final answers
-- **Temperature**: Keep between 0.5-0.7 for best results
 
 ## 🚀 Deployment
 
@@ -126,7 +155,7 @@ A professional, modern AI chat interface supporting Qwen models through the Deep
    - Connect your GitHub repository to Netlify
    - Netlify will automatically deploy on every push to main branch
 
-2. **Environment Variables**:
+2. **Environment Variables** (for Qwen API):
    ```
    QWEN_API_KEY=sk-or-v1-your-qwen-key
    ```
@@ -143,24 +172,29 @@ A professional, modern AI chat interface supporting Qwen models through the Deep
    ```
 
 2. **Environment Setup**:
-   - Set environment variables in Netlify dashboard
+   - Set environment variables in Netlify dashboard (only for Qwen API)
    - No build step required - static files are served directly
 
 ## 🔧 Troubleshooting
 
 ### Common Issues:
 
-1. **API Connection Errors**:
-   - Check environment variables are set correctly
+1. **Local Server Connection Errors**:
+   - Ensure vLLM or SGLang server is running on localhost:8000
+   - Check if the model is properly loaded
+   - Verify server logs for any errors
+
+2. **API Connection Errors**:
+   - Check environment variables are set correctly (for Qwen API)
    - Verify API keys are valid and have proper permissions
    - Check Netlify function logs for errors
 
-2. **Model Loading Issues**:
+3. **Model Loading Issues**:
    - Ensure correct model names are selected
    - Check API endpoint configuration
    - Verify model availability in your API plan
 
-3. **Performance Issues**:
+4. **Performance Issues**:
    - Check browser console for errors
    - Verify network connectivity
    - Clear browser cache if needed
