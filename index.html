@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Interface | DeepSeek & Qwen Models</title>
+    <meta name="description" content="Advanced chat interface for DeepSeek-R1-Distill and Qwen models with step-by-step reasoning, mathematical problem solving, and beautiful UI.">
+    <meta name="keywords" content="DeepSeek, Qwen, AI, chat, machine learning, mathematical reasoning, step-by-step thinking">
+    <meta name="author" content="AI Chat Interface">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.netlify.app/">
+    <meta property="og:title" content="AI Chat Interface - DeepSeek & Qwen">
+    <meta property="og:description" content="Advanced AI chat interface with mathematical reasoning and step-by-step thinking capabilities.">
+    <meta property="og:image" content="https://your-domain.netlify.app/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://your-domain.netlify.app/">
+    <meta property="twitter:title" content="AI Chat Interface - DeepSeek & Qwen">
+    <meta property="twitter:description" content="Advanced AI chat interface with mathematical reasoning and step-by-step thinking capabilities.">
+    <meta property="twitter:image" content="https://your-domain.netlify.app/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="header-main">
+                    <h1><i class="fas fa-brain"></i> AI Chat Interface</h1>
+                    <p>DeepSeek & Qwen Models</p>
+                </div>
+                <div class="header-actions">
+                    <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="settingsToggle" class="settings-toggle" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-status">
+                        <span class="status-indicator" id="connectionStatus">
+                            <i class="fas fa-circle"></i> Connecting...
+                        </span>
+                    </div>
+                    <div class="chat-actions">
+                        <button id="clearChat" class="action-button" title="Clear chat">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button id="exportChat" class="action-button" title="Export chat">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button id="shareChat" class="action-button" title="Share chat">
+                            <i class="fas fa-share"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message system-message">
+                        <div class="message-content">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="message-text">
+                                <p><strong>Welcome to AI Chat Interface!</strong></p>
+                                <p>I support both DeepSeek-R1-Distill and Qwen models. Choose your preferred model in the settings.</p>
+                                <p><em>Tip: Try asking me to solve a math problem or explain a concept!</em></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <div class="input-field">
+                            <textarea 
+                                id="userInput" 
+                                placeholder="Ask me anything... (I'll think step-by-step)"
+                                rows="3"
+                                maxlength="4000"
+                            ></textarea>
+                            <div class="input-actions">
+                                <span class="char-count" id="charCount">0/4000</span>
+                                <button id="voiceInput" class="voice-button" title="Voice input">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button id="sendButton" class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-options">
+                        <div class="temperature-control">
+                            <label for="temperature">Temperature: <span id="tempValue">0.6</span></label>
+                            <input type="range" id="temperature" min="0.1" max="1.0" step="0.1" value="0.6">
+                        </div>
+                        <div class="model-info">
+                            <span class="model-badge" id="modelBadge">DeepSeek-R1-Distill-Qwen-32B</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-cog"></i> Configuration</h3>
+                    <div class="config-item">
+                        <label for="modelType">Model Type:</label>
+                        <select id="modelType">
+                            <option value="deepseek">DeepSeek Models</option>
+                            <option value="qwen">Qwen Models</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label for="apiEndpoint">API Endpoint:</label>
+                        <input type="url" id="apiEndpoint" value="http://localhost:8000/v1/chat/completions" placeholder="Enter API endpoint">
+                    </div>
+                    <div class="config-item">
+                        <label for="modelSelect">Model:</label>
+                        <select id="modelSelect">
+                            <option value="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B">DeepSeek-R1-Distill-Qwen-32B</option>
+                            <option value="deepseek-ai/DeepSeek-R1-Distill-Llama-32B">DeepSeek-R1-Distill-Llama-32B</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label for="maxLength">Max Length:</label>
+                        <input type="number" id="maxLength" value="32768" min="1024" max="65536">
+                    </div>
+                    <div class="config-item">
+                        <label for="apiKey">API Key:</label>
+                        <input type="password" id="apiKey" placeholder="Enter API key if required">
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-lightbulb"></i> Quick Prompts</h3>
+                    <div class="quick-prompts">
+                        <button class="quick-prompt" data-prompt="Please solve this math problem step by step and put your final answer within \boxed{}: What is 15% of 240?">
+                            <i class="fas fa-calculator"></i> Math Problem
+                        </button>
+                        <button class="quick-prompt" data-prompt="Please explain the concept of machine learning in simple terms, thinking step by step.">
+                            <i class="fas fa-graduation-cap"></i> Explain Concept
+                        </button>
+                        <button class="quick-prompt" data-prompt="Write a short story about a robot learning to paint, thinking step by step about the creative process.">
+                            <i class="fas fa-palette"></i> Creative Writing
+                        </button>
+                        <button class="quick-prompt" data-prompt="Analyze the pros and cons of renewable energy sources, thinking step by step.">
+                            <i class="fas fa-chart-line"></i> Analysis
+                        </button>
+                        <button class="quick-prompt" data-prompt="Write a Python function to calculate the factorial of a number, with step-by-step explanation.">
+                            <i class="fas fa-code"></i> Code Example
+                        </button>
+                        <button class="quick-prompt" data-prompt="Compare and contrast supervised vs unsupervised learning in machine learning, thinking step by step.">
+                            <i class="fas fa-balance-scale"></i> Comparison
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-info-circle"></i> Usage Tips</h3>
+                    <ul class="tips-list">
+                        <li>Temperature: 0.1-1.0 (0.6 recommended)</li>
+                        <li>No system prompts needed for DeepSeek</li>
+                        <li>Math problems use \boxed{} format</li>
+                        <li>Models think step-by-step</li>
+                        <li>Multiple tests for evaluation</li>
+                        <li>Use voice input for hands-free interaction</li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="messageCount">0</span>
+                            <span class="stat-label">Messages</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="wordCount">0</span>
+                            <span class="stat-label">Words</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="sessionTime">00:00</span>
+                            <span class="stat-label">Session</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-cog"></i> Settings</h3>
+                    <button class="modal-close" id="closeSettings">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h4>Model Configuration</h4>
+                        <div class="setting-item">
+                            <label for="settingsModelType">Model Type:</label>
+                            <select id="settingsModelType">
+                                <option value="deepseek">DeepSeek Models</option>
+                                <option value="qwen">Qwen Models</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="settingsApiEndpoint">API Endpoint:</label>
+                            <input type="url" id="settingsApiEndpoint" placeholder="http://localhost:8000/v1/chat/completions">
+                        </div>
+                        <div class="setting-item">
+                            <label for="settingsApiKey">API Key:</label>
+                            <input type="password" id="settingsApiKey" placeholder="Enter API key if required">
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h4>Interface</h4>
+                        <div class="setting-item">
+                            <label for="autoScroll">Auto-scroll to new messages:</label>
+                            <input type="checkbox" id="autoScroll" checked>
+                        </div>
+                        <div class="setting-item">
+                            <label for="soundEnabled">Enable sound notifications:</label>
+                            <input type="checkbox" id="soundEnabled">
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h4>Data</h4>
+                        <div class="setting-item">
+                            <button id="exportSettings" class="btn-secondary">Export Settings</button>
+                            <button id="importSettings" class="btn-secondary">Import Settings</button>
+                        </div>
+                        <div class="setting-item">
+                            <button id="clearData" class="btn-danger">Clear All Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Modal -->
+        <div id="shareModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-share"></i> Share Chat</h3>
+                    <button class="modal-close" id="closeShare">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="share-options">
+                        <button class="share-option" data-method="copy">
+                            <i class="fas fa-copy"></i> Copy to Clipboard
+                        </button>
+                        <button class="share-option" data-method="download">
+                            <i class="fas fa-download"></i> Download as JSON
+                        </button>
+                        <button class="share-option" data-method="text">
+                            <i class="fas fa-file-text"></i> Export as Text
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Connecting to AI models...</p>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

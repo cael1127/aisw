@@ -1,0 +1,66 @@
+{
+  "name": "AI Chat Interface - DeepSeek & Qwen",
+  "short_name": "AI Chat",
+  "description": "Advanced AI chat interface for DeepSeek-R1-Distill and Qwen models with step-by-step reasoning, mathematical problem solving, and beautiful UI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "education", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik05NiA0OEM3My45MDg2IDQ4IDU2IDY1LjkwODYgNTYgODhWMTQ0QzU2IDE2Ni4wOTEgNzMuOTA4NiAxODQgOTYgMTg0QzExOC4wOTEgMTg0IDEzNiAxNjYuMDkxIDEzNiAxNDRWODhDMTM2IDY1LjkwODYgMTE4LjA5MSA0OCA5NiA0OFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik04OCA5NkM4OCA5MS41ODE3IDkxLjU4MTcgODggOTYgODhIMTA0QzEwOC40MTggODggMTEyIDkxLjU4MTcgMTEyIDk2VjEwNEMxMTIgMTA4LjQxOCAxMDguNDE4IDExMiAxMDQgMTEySDk2QzkxLjU4MTcgMTEyIDg4IDEwOC40MTggODggMTA0Vjk2WiIgZmlsbD0iIzY2N2VlYSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudDBfbGluZWFyXzFfMSIgeDE9IjAiIHkxPSIwIiB4Mj0iMTkyIiB5Mj0iMTkyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM2NjdlZWEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik0yNTYgMTI4QzE5Ny4yMTUgMTI4IDE1MiAxNzMuMjE1IDE1MiAyMzJWNDE2QzE1MiA0NzQuNzg1IDE5Ny4yMTUgNTEyIDI1NiA1MTJDMzE0Ljc4NSA1MTIgMzYwIDQ3NC43ODUgMzYwIDQxNlYyMzJDMzYwIDE3My4yMTUgMzE0Ljc4NSAxMjggMjU2IDEyOFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMzQgMjU2QzIzNCAyNDYuMDU5IDI0Mi4wNTkgMjM4IDI1MiAyMzhIMjYwQzI2OS45NDEgMjM4IDI3OCAyNDYuMDU5IDI3OCAyNTZWMjc2QzI3OCAyODUuOTQxIDI2OS45NDEgMjk0IDI2MCAyOTRIMjUyQzI0Mi4wNTkgMjk0IDIzNCAyODUuOTQxIDIzNCAyNzZWMjU2WiIgZmlsbD0iIzY2N2VlYSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudDBfbGluZWFyXzFfMSIgeDE9IjAiIHkxPSIwIiB4Mj0iNTEyIiB5Mj0iNTEyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM2NjdlZWEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4MCIgaGVpZ2h0PSI3MjAiIHZpZXdCb3g9IjAgMCAxMjgwIDcyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEyODAiIGhlaWdodD0iNzIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50MF9saW5lYXJfMV8xKSIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2NDAgMzYwKSI+CjxyZWN0IHdpZHRoPSI2MDAiIGhlaWdodD0iNDAwIiByeD0iMjAiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC45NSkiIHN0eWxlPSJiYWNrZHJvcC1maWx0ZXI6IGJsdXIoMjBweCkiLz4KPHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMyIDE2QzIzLjE2MzQgMTYgMTYgMjMuMTYzNCAxNiAzMlY0OEMxNiA1Ni44MzY2IDIzLjE2MzQgNjQgMzIgNjRINjRDNzIuODM2NiA2NCA4MCA1Ni44MzY2IDgwIDQ4VjMyQzgwIDIzLjE2MzQgNzIuODM2NiAxNiA2NCAxNkgzMloiIGZpbGw9IiM2NjdlZWEiLz4KPHBhdGggZD0iTTQ4IDQwQzQ4IDM2LjY4NjMgNTAuNjg2MyAzNCA1NCAzNEg1OEM2MS4zMTM3IDM0IDY0IDM2LjY4NjMgNjQgNDBWNDhDNjQgNTEuMzEzNyA2MS4zMTM3IDU0IDU4IDU0SDU0QzUwLjY4NjMgNTQgNDggNTEuMzEzNyA0OCA0OFY0MFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L2c+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MF9saW5lYXJfMV8xIiB4MT0iMCIgeTE9IjAiIHgyPSIxMjgwIiB5Mj0iNzIwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM2NjdlZWEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Chat",
+      "short_name": "New Chat",
+      "description": "Start a new conversation",
+      "url": "/?action=new",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMTIiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik00OCAzNkM0Mi40NzcgMzYgMzggNDAuNDc3IDM4IDQ2VjUwQzM4IDU1LjUyMyA0Mi40NzcgNjAgNDggNjBINjBDNjUuNTIzIDYwIDcwIDU1LjUyMyA3MCA1MFY0NkM3MCA0MC40NzcgNjUuNTIzIDM2IDYwIDM2SDQ4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTU2IDQ2QzU2IDQ0Ljg5NTQgNTYuODk1NCA0NCA1OCA0NEg2NkM2Ny4xMDQ2IDQ0IDY4IDQ0Ljg5NTQgNjggNDZWNTBDNjggNTEuMTA0NiA2Ny4xMDQ2IDUyIDY2IDUySDU4QzU2Ljg5NTQgNTIgNTYgNTEuMTA0NiA1NiA1MFY0NloiIGZpbGw9IiM2NjdlZWEiLz4KPHBhdGggZD0iTTU4IDU2QzU2Ljg5NTQgNTYgNTYgNTYuODk1NCA1NiA1OFY2MkM1NiA2My4xMDQ2IDU2Ljg5NTQgNjQgNTggNjRINjZDNjcuMTA0NiA2NCA2OCA2My4xMDQ2IDY4IDYyVjU4QzY4IDU2Ljg5NTQgNjcuMTA0NiA1NiA2NiA1Nkg1OFoiIGZpbGw9IiM2NjdlZWEiLz4KPHBhdGggZD0iTTUwIDU4QzUwIDU2Ljg5NTQgNTAuODk1NCA1NiA1MiA1Nkg2MkM2My4xMDQ2IDU2IDY0IDU2Ljg5NTQgNjQgNThWNjJDNjQgNjMuMTA0NiA2My4xMDQ2IDY0IDYyIDY0SDUyQzUwLjg5NTQgNjQgNTAgNjMuMTA0NiA1MCA2MlY1OFoiIGZpbGw9IiM2NjdlZWEiLz4KPC9zdmc+",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Open settings panel",
+      "url": "/?action=settings",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMTIiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik00OCAzNkM0Mi40NzcgMzYgMzggNDAuNDc3IDM4IDQ2VjUwQzM4IDU1LjUyMyA0Mi40NzcgNjAgNDggNjBINjBDNjUuNTIzIDYwIDcwIDU1LjUyMyA3MCA1MFY0NkM3MCA0MC40NzcgNjUuNTIzIDM2IDYwIDM2SDQ4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTQ4IDQyQzQ1Ljc5MDkgNDIgNDQgNDMuNzkwOSA0NCA0NlY1MEM0NCA1Mi4yMDkxIDQ1Ljc5MDkgNTQgNDggNTRINjBDNjIuMjA5MSA1NCA2NCA1Mi4yMDkxIDY0IDUwVjQ2QzY0IDQzLjc5MDkgNjIuMjA5MSA0MiA2MCA0Mkg0OFoiIGZpbGw9IiM2NjdlZWEiLz4KPHBhdGggZD0iTTQ4IDQ2QzQ2Ljg5NTQgNDYgNDYgNDYuODk1NCA0NiA0OFY0OEM0NiA0OS4xMDQ2IDQ2Ljg5NTQgNTAgNDggNTBINjBDNjEuMTA0NiA1MCA2MiA0OS4xMDQ2IDYyIDQ4VjQ2QzYyIDQ0Ljg5NTQgNjEuMTA0NiA0NCA2MCA0NEg0OFoiIGZpbGw9IiM2NjdlZWEiLz4KPC9zdmc+",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+} 
