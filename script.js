@@ -1,3 +1,34 @@
+// Immediate cache-busting check
+(function() {
+    // Check if we're loading from cache
+    if (performance.navigation.type === 1) {
+        // This is a reload, force fresh content
+        const url = new URL(window.location);
+        url.searchParams.set('v', Date.now());
+        if (!url.searchParams.has('fresh')) {
+            url.searchParams.set('fresh', '1');
+            window.location.replace(url.toString());
+        }
+    }
+    
+    // Check for old content immediately
+    const oldContent = document.querySelector('.message-content p');
+    if (oldContent && oldContent.textContent.includes('Choose an API above')) {
+        window.location.reload(true);
+        return;
+    }
+    
+    // Check for old API options
+    const apiSelector = document.getElementById('apiSelector');
+    if (apiSelector) {
+        const options = Array.from(apiSelector.options).map(opt => opt.value);
+        if (options.includes('qwen') || options.includes('qwen2')) {
+            window.location.reload(true);
+            return;
+        }
+    }
+})();
+
 class ChatApp {
     constructor() {
         this.messages = [];
