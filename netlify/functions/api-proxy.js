@@ -1,128 +1,95 @@
 const fetch = require('node-fetch');
 
-exports.handler = async (event, context) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
-  try {
-    // Parse the request body
-    const requestBody = JSON.parse(event.body);
-    
-    // Determine which API key to use based on the endpoint
-    let apiKey;
-    const endpoint = requestBody.endpoint || '';
-    
-    // Check if it's a local DeepSeek endpoint (no API key needed)
-    if (endpoint.includes('localhost:8000')) {
-      apiKey = 'local'; // No API key needed for local models
-    } else {
-      // For API endpoints, use the primary API key first, then fallback to secondary
-      apiKey = process.env.QWEN_API_KEY || process.env.QWEN2_API_KEY;
-      
-      if (!apiKey) {
+exports.handler = async function(event, context) {
+    // Only allow POST requests
+    if (event.httpMethod !== 'POST') {
         return {
-          statusCode: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS'
-          },
-          body: JSON.stringify({ 
-            error: 'No API key configured. Please set QWEN_API_KEY or QWEN2_API_KEY environment variable.' 
-          })
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method not allowed' })
         };
-      }
     }
-    
-    if (!apiKey || apiKey === 'local') {
-      // For local models, we'll make a direct request without API key
-      const targetUrl = requestBody.endpoint || 'http://localhost:8000/v1/chat/completions';
-      
-      const response = await fetch(targetUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: requestBody.model,
-          messages: requestBody.messages,
-          temperature: requestBody.temperature,
-          max_tokens: requestBody.max_tokens,
-          stream: false
-        })
-      });
-      
-      const data = await response.json();
-      
-      return {
-        statusCode: response.status,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS'
-        },
-        body: JSON.stringify(data)
-      };
+
+    try {
+        const { message, apiType } = JSON.parse(event.body);
+        
+        if (!message) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Message is required' })
+            };
+        }
+
+        // Determine which API key to use
+        let apiKey;
+        if (apiType === 'qwen') {
+            apiKey = process.env.QWEN_API_KEY;
+        } else if (apiType === 'qwen2') {
+            apiKey = process.env.QWEN2_API_KEY;
+        } else {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Invalid API type' })
+            };
+        }
+
+        if (!apiKey) {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: `API key not configured for ${apiType}` })
+            };
+        }
+
+        // Make the API call to DeepSeek
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'qwen2.5-72b-instruct',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are a helpful AI assistant. Please provide clear, step-by-step explanations when appropriate.'
+                    },
+                    {
+                        role: 'user',
+                        content: message
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 4000,
+                stream: false
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Error:', errorText);
+            return {
+                statusCode: response.status,
+                body: JSON.stringify({ error: 'API request failed' })
+            };
+        }
+
+        const data = await response.json();
+        
+        return {
+            statusCode: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                response: data.choices[0].message.content
+            })
+        };
+
+    } catch (error) {
+        console.error('Function error:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
     }
-    
-    // For API endpoints, use the appropriate API key
-    const targetUrl = requestBody.endpoint || 'https://api.deepseek.com/v1/chat/completions';
-    
-    // Prepare headers
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    };
-
-    // Make the request to the actual API
-    const response = await fetch(targetUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        model: requestBody.model,
-        messages: requestBody.messages,
-        temperature: requestBody.temperature,
-        max_tokens: requestBody.max_tokens,
-        stream: false
-      })
-    });
-
-    const data = await response.json();
-
-    // Return the response
-    return {
-      statusCode: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify(data)
-    };
-
-  } catch (error) {
-    console.error('Error in API proxy:', error);
-    
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify({ 
-        error: 'Internal server error',
-        message: error.message 
-      })
-    };
-  }
 }; 

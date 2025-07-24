@@ -3,266 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="-1">
-    <meta http-equiv="Last-Modified" content="Mon, 01 Jan 2024 00:00:00 GMT">
-    <title>AI Chat Interface | Dual Qwen APIs</title>
-    <meta name="description" content="Advanced chat interface for dual Qwen APIs with beautiful UI and professional design.">
-    <meta name="keywords" content="Qwen, AI, chat, machine learning, dual APIs, professional interface">
-    <meta name="author" content="AI Chat Interface">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://your-domain.netlify.app/">
-    <meta property="og:title" content="AI Chat Interface - Dual Qwen APIs">
-    <meta property="og:description" content="Professional AI chat interface with dual Qwen API support.">
-    <meta property="og:image" content="https://your-domain.netlify.app/og-image.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://your-domain.netlify.app/">
-    <meta property="twitter:title" content="AI Chat Interface - Dual Qwen APIs">
-    <meta property="twitter:description" content="Professional AI chat interface with dual Qwen API support.">
-    <meta property="twitter:image" content="https://your-domain.netlify.app/og-image.png">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
-    
-    <!-- Preload critical resources -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
-    <link rel="stylesheet" href="styles.css?v=3">
-    
-    <!-- PWA manifest -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#667eea">
+    <title>AI Chat</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <div class="header-content">
-                <div class="header-main">
-                    <h1><i class="fas fa-brain"></i> AI Chat Interface</h1>
-                    <p>Dual Qwen APIs</p>
-                </div>
-                <div class="header-actions">
-                    <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <button id="settingsToggle" class="settings-toggle" title="Settings">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                </div>
+            <h1><i class="fas fa-robot"></i> AI Chat</h1>
+            <div class="api-selector">
+                <select id="apiSelector">
+                    <option value="qwen">Qwen Primary</option>
+                    <option value="qwen2">Qwen Secondary</option>
+                </select>
             </div>
         </header>
 
-        <main class="main-content">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <div class="chat-status">
-                        <span class="status-indicator" id="connectionStatus">
-                            <i class="fas fa-circle"></i> Ready
-                        </span>
-                    </div>
-                    <div class="chat-actions">
-                        <button id="clearChat" class="action-button" title="Clear chat">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button id="exportChat" class="action-button" title="Export chat">
-                            <i class="fas fa-download"></i>
-                        </button>
-                        <button id="shareChat" class="action-button" title="Share chat">
-                            <i class="fas fa-share"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message system-message">
-                        <div class="message-content">
-                            <i class="fas fa-info-circle"></i>
-                            <div class="message-text">
-                                <p><strong>Welcome to AI Chat Interface!</strong></p>
-                                <p>I support two Qwen APIs. Switch between them using the dropdown in the sidebar.</p>
-                                <p><em>Tip: Try asking me to explain a concept or solve a problem!</em></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-container">
-                    <div class="input-wrapper">
-                        <div class="input-field">
-                            <textarea 
-                                id="userInput" 
-                                placeholder="Ask me anything... (I'll think step-by-step)"
-                                rows="3"
-                                maxlength="4000"
-                            ></textarea>
-                            <div class="input-actions">
-                                <span class="char-count" id="charCount">0/4000</span>
-                                <button id="voiceInput" class="voice-button" title="Voice input">
-                                    <i class="fas fa-microphone"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button id="sendButton" class="send-button">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                    <div class="input-options">
-                        <div class="model-info">
-                            <span class="model-badge" id="modelBadge">Qwen Primary API</span>
-                        </div>
+        <main class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message system">
+                    <div class="message-content">
+                        <p>Hello! I'm your AI assistant. Choose an API above and start chatting!</p>
                     </div>
                 </div>
             </div>
 
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-cog"></i> API Selection</h3>
-                    <div class="api-selector">
-                        <label for="apiSelector">Choose API:</label>
-                        <select id="apiSelector">
-                            <option value="qwen">Qwen Primary API</option>
-                            <option value="qwen2">Qwen Secondary API</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-lightbulb"></i> Quick Prompts</h3>
-                    <div class="quick-prompts">
-                        <button class="quick-prompt" data-prompt="Explain quantum computing in simple terms">Quantum Computing</button>
-                        <button class="quick-prompt" data-prompt="Write a Python function to calculate fibonacci numbers">Python Fibonacci</button>
-                        <button class="quick-prompt" data-prompt="What are the benefits of renewable energy?">Renewable Energy</button>
-                        <button class="quick-prompt" data-prompt="Explain machine learning to a beginner">Machine Learning</button>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-info-circle"></i> Tips</h3>
-                    <ul class="tips-list">
-                        <li>Switch between APIs for different responses</li>
-                        <li>Use voice input for hands-free chatting</li>
-                        <li>Export your conversations anytime</li>
-                        <li>Try different models for varied results</li>
-                    </ul>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
-                    <div class="statistics-grid">
-                        <div class="stat-item">
-                            <span class="stat-label">Messages</span>
-                            <span class="stat-value" id="messageCount">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Words</span>
-                            <span class="stat-value" id="wordCount">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Session</span>
-                            <span class="stat-value" id="sessionTime">00:00</span>
-                        </div>
-                    </div>
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="userInput" 
+                        placeholder="Type your message here..."
+                        rows="3"
+                    ></textarea>
+                    <button id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </main>
-
-        <!-- Settings Modal -->
-        <div id="settingsModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="fas fa-cog"></i> Settings</h3>
-                    <button class="modal-close" id="closeSettings">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="settings-section">
-                        <h4>Model Configuration</h4>
-                        <div class="setting-item">
-                            <label for="settingsModelType">API Selection:</label>
-                            <select id="settingsModelType">
-                                <option value="qwen" selected>Qwen Primary API</option>
-                                <option value="qwen2">Qwen Secondary API</option>
-                            </select>
-                        </div>
-                        <div class="setting-item">
-                            <label for="settingsApiEndpoint">API Endpoint:</label>
-                            <input type="url" id="settingsApiEndpoint" placeholder="https://api.deepseek.com/v1/chat/completions" value="https://api.deepseek.com/v1/chat/completions">
-                        </div>
-                        <div class="setting-item">
-                            <label for="settingsApiKey">API Key:</label>
-                            <input type="password" id="settingsApiKey" placeholder="Enter API key if required">
-                        </div>
-                    </div>
-                    <div class="settings-section">
-                        <h4>Interface</h4>
-                        <div class="setting-item">
-                            <label for="autoScroll">Auto-scroll to new messages:</label>
-                            <input type="checkbox" id="autoScroll" checked>
-                        </div>
-                        <div class="setting-item">
-                            <label for="soundEnabled">Enable sound notifications:</label>
-                            <input type="checkbox" id="soundEnabled">
-                        </div>
-                    </div>
-                    <div class="settings-section">
-                        <h4>Data</h4>
-                        <div class="setting-item">
-                            <button id="exportSettings" class="btn-secondary">Export Settings</button>
-                            <button id="importSettings" class="btn-secondary">Import Settings</button>
-                        </div>
-                        <div class="setting-item">
-                            <button id="clearData" class="btn-danger">Clear All Data</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Share Modal -->
-        <div id="shareModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="fas fa-share"></i> Share Chat</h3>
-                    <button class="modal-close" id="closeShare">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="share-options">
-                        <button class="share-option" data-method="copy">
-                            <i class="fas fa-copy"></i> Copy to Clipboard
-                        </button>
-                        <button class="share-option" data-method="download">
-                            <i class="fas fa-download"></i> Download as JSON
-                        </button>
-                        <button class="share-option" data-method="text">
-                            <i class="fas fa-file-text"></i> Export as Text
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Loading overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>Connecting to AI models...</p>
-        </div>
-    </div>
-
-    <!-- Toast notifications -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <script src="script.js?v=3"></script>
+    <script src="script.js"></script>
 </body>
 </html> 
