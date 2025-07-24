@@ -46,7 +46,7 @@
             <div class="header-content">
                 <div class="header-main">
                     <h1><i class="fas fa-brain"></i> AI Chat Interface</h1>
-                    <p>DeepSeek-R1-Distill & Qwen Models</p>
+                    <p>DeepSeek-R1-Distill & Dual Qwen APIs</p>
                 </div>
                 <div class="header-actions">
                     <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
@@ -86,7 +86,7 @@
                             <i class="fas fa-info-circle"></i>
                             <div class="message-text">
                                 <p><strong>Welcome to AI Chat Interface!</strong></p>
-                                <p>I support DeepSeek-R1-Distill and Qwen models locally. Set your API key in the settings to get started.</p>
+                                <p>I support DeepSeek-R1-Distill models locally and Qwen models via two different APIs. Choose your preferred model in the settings.</p>
                                 <p><em>Tip: Try asking me to solve a math problem or explain a concept!</em></p>
                             </div>
                         </div>
@@ -132,7 +132,8 @@
                         <label for="modelType">Model Type:</label>
                         <select id="modelType">
                             <option value="deepseek" selected>DeepSeek-R1-Distill (Local)</option>
-                            <option value="qwen">Qwen Models (API)</option>
+                            <option value="qwen">Qwen Models (Primary API)</option>
+                            <option value="qwen2">Qwen Models (Secondary API)</option>
                         </select>
                     </div>
                     <div class="config-item">
@@ -226,7 +227,8 @@
                             <label for="settingsModelType">Model Type:</label>
                             <select id="settingsModelType">
                                 <option value="deepseek" selected>DeepSeek-R1-Distill (Local)</option>
-                                <option value="qwen">Qwen Models (API)</option>
+                                <option value="qwen">Qwen Models (Primary API)</option>
+                                <option value="qwen2">Qwen Models (Secondary API)</option>
                             </select>
                         </div>
                         <div class="setting-item">

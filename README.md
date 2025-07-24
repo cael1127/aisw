@@ -51,12 +51,11 @@ python3 -m sglang.launch_server \
    - Click "New site from Git"
    - Connect your GitHub repository: `cael1127/aisw`
 
-2. **Set Environment Variables** (for Qwen API):
-   - In your Netlify dashboard, go to **Site settings** → **Environment variables**
-   - Add the following variable (only needed for Qwen models):
-     ```
-     QWEN_API_KEY=your_qwen_api_key_here
-     ```
+2. **Set Environment Variables** (for Qwen APIs):
+   ```
+   QWEN_API_KEY=sk-or-v1-your-first-qwen-key
+   QWEN2_API_KEY=sk-or-v1-your-second-qwen-key
+   ```
 
 3. **Deploy**:
    - Netlify will automatically deploy your site
@@ -78,7 +77,8 @@ python3 -m sglang.launch_server \
 3. **Set up environment variables** (optional):
    Create a `.env` file in the root directory:
    ```
-   QWEN_API_KEY=your_qwen_api_key_here
+   QWEN_API_KEY=your_first_qwen_api_key_here
+   QWEN2_API_KEY=your_second_qwen_api_key_here
    ```
 
 4. **Run locally**:
@@ -127,11 +127,19 @@ python3 -m sglang.launch_server \
 - **Features**: Step-by-step reasoning, mathematical problem solving
 - **Server**: vLLM or SGLang required
 
-#### Qwen Models (DeepSeek API)
+#### Qwen Models (Primary API)
 - **Endpoint**: `https://api.deepseek.com/v1/chat/completions`
 - **Models**: Qwen2.5-72B, Qwen2.5-32B, Qwen2.5-14B, Qwen2.5-7B, Qwen2-72B, Qwen2-32B, Qwen2-14B, Qwen2-7B
 - **Temperature**: 0.1-1.0 (0.7 recommended)
 - **Features**: Advanced Qwen model capabilities with system prompts
+- **API Key**: `QWEN_API_KEY`
+
+#### Qwen Models (Secondary API)
+- **Endpoint**: `https://api.deepseek.com/v1/chat/completions`
+- **Models**: Qwen2.5-72B, Qwen2.5-32B, Qwen2.5-14B, Qwen2.5-7B, Qwen2-72B, Qwen2-32B, Qwen2-14B, Qwen2-7B
+- **Temperature**: 0.1-1.0 (0.7 recommended)
+- **Features**: Advanced Qwen model capabilities with system prompts
+- **API Key**: `QWEN2_API_KEY`
 
 ### Usage Guidelines
 

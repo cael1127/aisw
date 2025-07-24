@@ -97,16 +97,36 @@ class AIChat {
                 ],
                 defaultModel: 'qwen2.5-72b-instruct',
                 temperatureRange: { min: 0.1, max: 1.0, default: 0.7 },
-                description: 'Qwen models via DeepSeek API'
+                description: 'Qwen models via DeepSeek API (Primary)',
+                apiKeyEnv: 'QWEN_API_KEY'
+            },
+            qwen2: {
+                endpoint: 'https://api.deepseek.com/v1/chat/completions',
+                models: [
+                    'qwen2.5-72b-instruct',
+                    'qwen2.5-32b-instruct',
+                    'qwen2.5-14b-instruct',
+                    'qwen2.5-7b-instruct',
+                    'qwen2-72b-instruct',
+                    'qwen2-32b-instruct',
+                    'qwen2-14b-instruct',
+                    'qwen2-7b-instruct'
+                ],
+                defaultModel: 'qwen2.5-72b-instruct',
+                temperatureRange: { min: 0.1, max: 1.0, default: 0.7 },
+                description: 'Qwen models via DeepSeek API (Secondary)',
+                apiKeyEnv: 'QWEN2_API_KEY'
             }
         };
     }
 
     // Get API key from environment variables or user input
     getApiKey() {
+        const currentConfig = this.modelConfigs[this.settings.modelType];
+        
         // First try to get from environment variable (for production)
         if (typeof process !== 'undefined' && process.env) {
-            return process.env.QWEN_API_KEY || '';
+            return process.env[currentConfig.apiKeyEnv] || '';
         }
         
         // Fallback to user input (for development)
