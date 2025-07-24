@@ -77,7 +77,15 @@ class ChatApp {
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.textContent = content;
+        
+        // Format the content with proper line breaks
+        const formattedContent = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+            .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic text
+            .replace(/\n/g, '<br>') // Line breaks
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Handle any remaining bold
+        
+        contentDiv.innerHTML = formattedContent;
         
         messageDiv.appendChild(contentDiv);
         this.messagesContainer.appendChild(messageDiv);
