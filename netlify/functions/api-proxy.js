@@ -14,7 +14,7 @@ exports.handler = async (event, context) => {
     const requestBody = JSON.parse(event.body);
     
     // Get API key from environment variables
-    const apiKey = process.env.DEEPSEEK_API_KEY || process.env.QWEN_API_KEY;
+    const apiKey = process.env.QWEN_API_KEY;
     
     if (!apiKey) {
       return {

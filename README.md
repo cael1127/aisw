@@ -1,10 +1,10 @@
-# AI Chat Interface - DeepSeek & Qwen Models
+# AI Chat Interface - Qwen Models
 
-A professional, modern AI chat interface supporting DeepSeek-R1-Distill and Qwen models with beautiful animations, glassmorphism design, and secure API handling.
+A professional, modern AI chat interface supporting Qwen models through the DeepSeek API with beautiful animations, glassmorphism design, and secure API handling.
 
 ## 🚀 Features
 
-- **Multi-Model Support**: DeepSeek-R1-Distill and Qwen models
+- **Qwen Model Support**: Access to all Qwen models via DeepSeek API
 - **Professional Design**: Glassmorphism effects with smooth animations
 - **Secure API Handling**: Serverless functions for secure API key management
 - **PWA Ready**: Progressive Web App capabilities
@@ -26,9 +26,8 @@ A professional, modern AI chat interface supporting DeepSeek-R1-Distill and Qwen
 
 2. **Set Environment Variables**:
    - In your Netlify dashboard, go to **Site settings** → **Environment variables**
-   - Add the following variables:
+   - Add the following variable:
      ```
-     DEEPSEEK_API_KEY=your_deepseek_api_key_here
      QWEN_API_KEY=your_qwen_api_key_here
      ```
 
@@ -52,7 +51,6 @@ A professional, modern AI chat interface supporting DeepSeek-R1-Distill and Qwen
 3. **Set up environment variables**:
    Create a `.env` file in the root directory:
    ```
-   DEEPSEEK_API_KEY=your_deepseek_api_key_here
    QWEN_API_KEY=your_qwen_api_key_here
    ```
 
@@ -95,30 +93,30 @@ A professional, modern AI chat interface supporting DeepSeek-R1-Distill and Qwen
 
 ### Model Settings
 
-#### DeepSeek Models (Local/Server)
-- **Endpoint**: `http://localhost:8000/v1/chat/completions`
-- **Models**: DeepSeek-R1-Distill-Qwen-32B, DeepSeek-R1-Distill-Llama-32B
-- **Temperature**: 0.5-0.7 (recommended: 0.6)
-- **Features**: Step-by-step reasoning, mathematical problem solving
-
 #### Qwen Models (DeepSeek API)
 - **Endpoint**: `https://api.deepseek.com/v1/chat/completions`
 - **Models**: Qwen2.5-72B, Qwen2.5-32B, Qwen2.5-14B, Qwen2.5-7B, Qwen2-72B, Qwen2-32B, Qwen2-14B, Qwen2-7B
 - **Temperature**: 0.1-1.0 (recommended: 0.7)
 - **Features**: Advanced Qwen model capabilities with system prompts
 
-### Usage Guidelines
+#### DeepSeek Models (Local - Optional)
+- **Endpoint**: `http://localhost:8000/v1/chat/completions`
+- **Models**: DeepSeek-R1-Distill-Qwen-32B, DeepSeek-R1-Distill-Llama-32B
+- **Temperature**: 0.5-0.7 (recommended: 0.6)
+- **Features**: Step-by-step reasoning, mathematical problem solving
 
-#### DeepSeek Models:
-- **No System Prompts**: DeepSeek models don't require system prompts
-- **Thinking Patterns**: Use `<think>` tags for step-by-step reasoning
-- **Math Problems**: Use `\boxed{}` format for final answers
-- **Temperature**: Keep between 0.5-0.7 for best results
+### Usage Guidelines
 
 #### Qwen Models:
 - **System Prompts**: Include helpful system messages
 - **Temperature**: Flexible range from 0.1-1.0
 - **Step-by-step**: Models naturally provide detailed explanations
+
+#### DeepSeek Models (Local):
+- **No System Prompts**: DeepSeek models don't require system prompts
+- **Thinking Patterns**: Use `<think>` tags for step-by-step reasoning
+- **Math Problems**: Use `\boxed{}` format for final answers
+- **Temperature**: Keep between 0.5-0.7 for best results
 
 ## 🚀 Deployment
 
@@ -130,7 +128,6 @@ A professional, modern AI chat interface supporting DeepSeek-R1-Distill and Qwen
 
 2. **Environment Variables**:
    ```
-   DEEPSEEK_API_KEY=sk-or-v1-your-deepseek-key
    QWEN_API_KEY=sk-or-v1-your-qwen-key
    ```
 

@@ -46,7 +46,7 @@
             <div class="header-content">
                 <div class="header-main">
                     <h1><i class="fas fa-brain"></i> AI Chat Interface</h1>
-                    <p>DeepSeek & Qwen Models</p>
+                    <p>Qwen Models via DeepSeek API</p>
                 </div>
                 <div class="header-actions">
                     <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
@@ -86,7 +86,7 @@
                             <i class="fas fa-info-circle"></i>
                             <div class="message-text">
                                 <p><strong>Welcome to AI Chat Interface!</strong></p>
-                                <p>I support both DeepSeek-R1-Distill and Qwen models. Choose your preferred model in the settings.</p>
+                                <p>I support Qwen models through the DeepSeek API. Set your API key in the settings to get started.</p>
                                 <p><em>Tip: Try asking me to solve a math problem or explain a concept!</em></p>
                             </div>
                         </div>
@@ -131,19 +131,25 @@
                     <div class="config-item">
                         <label for="modelType">Model Type:</label>
                         <select id="modelType">
-                            <option value="deepseek">DeepSeek Models</option>
-                            <option value="qwen">Qwen Models</option>
+                            <option value="qwen" selected>Qwen Models</option>
+                            <option value="deepseek">DeepSeek Models (Local)</option>
                         </select>
                     </div>
                     <div class="config-item">
                         <label for="apiEndpoint">API Endpoint:</label>
-                        <input type="url" id="apiEndpoint" value="http://localhost:8000/v1/chat/completions" placeholder="Enter API endpoint">
+                        <input type="url" id="apiEndpoint" value="https://api.deepseek.com/v1/chat/completions" placeholder="Enter API endpoint">
                     </div>
                     <div class="config-item">
                         <label for="modelSelect">Model:</label>
                         <select id="modelSelect">
-                            <option value="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B">DeepSeek-R1-Distill-Qwen-32B</option>
-                            <option value="deepseek-ai/DeepSeek-R1-Distill-Llama-32B">DeepSeek-R1-Distill-Llama-32B</option>
+                            <option value="qwen2.5-72b-instruct">Qwen2.5-72B-Instruct</option>
+                            <option value="qwen2.5-32b-instruct">Qwen2.5-32B-Instruct</option>
+                            <option value="qwen2.5-14b-instruct">Qwen2.5-14B-Instruct</option>
+                            <option value="qwen2.5-7b-instruct">Qwen2.5-7B-Instruct</option>
+                            <option value="qwen2-72b-instruct">Qwen2-72B-Instruct</option>
+                            <option value="qwen2-32b-instruct">Qwen2-32B-Instruct</option>
+                            <option value="qwen2-14b-instruct">Qwen2-14B-Instruct</option>
+                            <option value="qwen2-7b-instruct">Qwen2-7B-Instruct</option>
                         </select>
                     </div>
                     <div class="config-item">
@@ -225,13 +231,13 @@
                         <div class="setting-item">
                             <label for="settingsModelType">Model Type:</label>
                             <select id="settingsModelType">
-                                <option value="deepseek">DeepSeek Models</option>
-                                <option value="qwen">Qwen Models</option>
+                                <option value="qwen" selected>Qwen Models</option>
+                                <option value="deepseek">DeepSeek Models (Local)</option>
                             </select>
                         </div>
                         <div class="setting-item">
                             <label for="settingsApiEndpoint">API Endpoint:</label>
-                            <input type="url" id="settingsApiEndpoint" placeholder="http://localhost:8000/v1/chat/completions">
+                            <input type="url" id="settingsApiEndpoint" placeholder="https://api.deepseek.com/v1/chat/completions" value="https://api.deepseek.com/v1/chat/completions">
                         </div>
                         <div class="setting-item">
                             <label for="settingsApiKey">API Key:</label>

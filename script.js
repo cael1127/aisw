@@ -60,10 +60,10 @@ class AIChat {
         
         // Default settings
         this.settings = {
-            modelType: 'deepseek',
-            apiEndpoint: 'http://localhost:8000/v1/chat/completions',
-            model: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
-            temperature: 0.6,
+            modelType: 'qwen',
+            apiEndpoint: 'https://api.deepseek.com/v1/chat/completions',
+            model: 'qwen2.5-72b-instruct',
+            temperature: 0.7,
             maxLength: 32768,
             apiKey: '',
             theme: 'light',
@@ -104,7 +104,7 @@ class AIChat {
     getApiKey() {
         // First try to get from environment variable (for production)
         if (typeof process !== 'undefined' && process.env) {
-            return process.env.DEEPSEEK_API_KEY || process.env.QWEN_API_KEY || '';
+            return process.env.QWEN_API_KEY || '';
         }
         
         // Fallback to user input (for development)
