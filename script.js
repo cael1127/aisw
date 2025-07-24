@@ -1,3 +1,22 @@
+// Force reload if old configuration elements are detected
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if old configuration elements exist
+    const oldConfigElements = document.querySelectorAll('#modelType, #temperature, .temperature-control');
+    if (oldConfigElements.length > 0) {
+        console.log('Old configuration detected, forcing reload...');
+        window.location.reload(true);
+        return;
+    }
+    
+    // Check if old welcome message exists
+    const welcomeText = document.querySelector('.message-text');
+    if (welcomeText && welcomeText.textContent.includes('DeepSeek-R1-Distill')) {
+        console.log('Old welcome message detected, forcing reload...');
+        window.location.reload(true);
+        return;
+    }
+});
+
 class AIChat {
     constructor() {
         this.initializeElements();
