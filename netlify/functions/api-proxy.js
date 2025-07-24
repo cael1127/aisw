@@ -60,7 +60,7 @@ exports.handler = async function(event, context) {
         console.log('Making Gemini API call');
 
         // Make the API call to Google Gemini
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -74,9 +74,15 @@ exports.handler = async function(event, context) {
                             }
                         ]
                     }
-                ]
+                ],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048
+                }
             })
         });
+
+        console.log('Gemini API response status:', response.status);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -94,11 +100,13 @@ exports.handler = async function(event, context) {
         }
 
         const data = await response.json();
+        console.log('Gemini API response data:', JSON.stringify(data, null, 2));
         
         // Extract the response text from Gemini's response format
         const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
         
         if (!responseText) {
+            console.error('No response text found in Gemini response');
             return {
                 statusCode: 500,
                 headers: {
