@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     <title>AI Chat</title>
-    <link rel="stylesheet" href="styles.css?v=13">
+    <link rel="stylesheet" href="styles.css?v=14">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -35,6 +35,12 @@
                             <span class="model-badge">Gemini 1.5 Flash</span>
                         </div>
                         <div class="conversation-controls">
+                            <button class="control-button" id="voiceInput" title="Voice Input">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="control-button" id="imageGen" title="Generate Image">
+                                <i class="fas fa-image"></i>
+                            </button>
                             <button class="control-button" id="clearChat" title="Clear Conversation">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -58,7 +64,16 @@
                                     <span class="message-author">AI Assistant</span>
                                 </div>
                                 <div class="message-text">
-                                    <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
+                                    <p>Hello! I'm your enhanced AI assistant powered by Google Gemini. I can help you with:</p>
+                                    <ul>
+                                        <li>📝 Writing and editing content</li>
+                                        <li>💻 Programming and code analysis</li>
+                                        <li>🎨 Image generation and design</li>
+                                        <li>🔊 Voice input and transcription</li>
+                                        <li>📁 File analysis and processing</li>
+                                        <li>🧠 Problem solving and brainstorming</li>
+                                    </ul>
+                                    <p>How can I assist you today?</p>
                                 </div>
                             </div>
                         </div>
@@ -69,15 +84,25 @@
                             <div class="input-field">
                                 <textarea 
                                     id="userInput" 
-                                    placeholder="Message AI Chat..."
+                                    placeholder="Message AI Chat... (or drag files here)"
                                     rows="1"
                                 ></textarea>
-                                <button id="sendButton" class="send-button">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
+                                <div class="input-actions">
+                                    <button class="action-btn" id="fileUpload" title="Upload File">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                    <button class="action-btn" id="voiceBtn" title="Voice Input">
+                                        <i class="fas fa-microphone"></i>
+                                    </button>
+                                    <button id="sendButton" class="send-button">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
                             </div>
+                            <input type="file" id="fileInput" multiple accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" style="display: none;">
                             <div class="input-footer">
                                 <span class="input-hint">AI Chat can make mistakes. Consider checking important information.</span>
+                                <div class="input-stats" id="inputStats"></div>
                             </div>
                         </div>
                     </div>
@@ -86,6 +111,67 @@
         </div>
     </div>
 
-    <script src="script.js?v=13"></script>
+    <!-- Voice Input Modal -->
+    <div class="modal" id="voiceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-microphone"></i> Voice Input</h3>
+                <button class="close-btn" id="closeVoiceModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="voice-status" id="voiceStatus">
+                    <i class="fas fa-microphone-slash"></i>
+                    <p>Click the microphone to start recording</p>
+                </div>
+                <div class="voice-controls">
+                    <button class="voice-btn" id="startVoice">
+                        <i class="fas fa-microphone"></i> Start Recording
+                    </button>
+                    <button class="voice-btn" id="stopVoice" disabled>
+                        <i class="fas fa-stop"></i> Stop Recording
+                    </button>
+                </div>
+                <div class="voice-transcript" id="voiceTranscript"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Generation Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-image"></i> Generate Image</h3>
+                <button class="close-btn" id="closeImageModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="image-form">
+                    <textarea 
+                        id="imagePrompt" 
+                        placeholder="Describe the image you want to generate..."
+                        rows="4"
+                    ></textarea>
+                    <div class="image-options">
+                        <select id="imageStyle">
+                            <option value="realistic">Realistic</option>
+                            <option value="artistic">Artistic</option>
+                            <option value="cartoon">Cartoon</option>
+                            <option value="abstract">Abstract</option>
+                        </select>
+                        <select id="imageSize">
+                            <option value="1024x1024">Square (1024x1024)</option>
+                            <option value="1792x1024">Wide (1792x1024)</option>
+                            <option value="1024x1792">Tall (1024x1792)</option>
+                        </select>
+                    </div>
+                    <button class="generate-btn" id="generateImage">
+                        <i class="fas fa-magic"></i> Generate Image
+                    </button>
+                </div>
+                <div class="image-result" id="imageResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=14"></script>
 </body>
 </html> 
