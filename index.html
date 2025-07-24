@@ -114,12 +114,8 @@
                         </button>
                     </div>
                     <div class="input-options">
-                        <div class="temperature-control">
-                            <label for="temperature">Temperature: <span id="tempValue">0.6</span></label>
-                            <input type="range" id="temperature" min="0.1" max="1.0" step="0.1" value="0.6">
-                        </div>
                         <div class="model-info">
-                            <span class="model-badge" id="modelBadge">DeepSeek-R1-Distill-Qwen-32B</span>
+                            <span class="model-badge" id="modelBadge">Qwen Primary API</span>
                         </div>
                     </div>
                 </div>
@@ -188,11 +184,10 @@
                     <div class="settings-section">
                         <h4>Model Configuration</h4>
                         <div class="setting-item">
-                            <label for="settingsModelType">Model Type:</label>
+                            <label for="settingsModelType">API Selection:</label>
                             <select id="settingsModelType">
-                                <option value="qwen" selected>Qwen Models (Primary API)</option>
-                                <option value="qwen2">Qwen Models (Secondary API)</option>
-                                <option value="deepseek">DeepSeek-R1-Distill (Local)</option>
+                                <option value="qwen" selected>Qwen Primary API</option>
+                                <option value="qwen2">Qwen Secondary API</option>
                             </select>
                         </div>
                         <div class="setting-item">

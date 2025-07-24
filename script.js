@@ -14,8 +14,6 @@ class AIChat {
         this.chatMessages = document.getElementById('chatMessages');
         this.userInput = document.getElementById('userInput');
         this.sendButton = document.getElementById('sendButton');
-        this.temperatureSlider = document.getElementById('temperature');
-        this.tempValue = document.getElementById('tempValue');
         this.apiSelector = document.getElementById('apiSelector');
         this.maxLength = document.getElementById('maxLength');
         this.apiEndpoint = document.getElementById('apiEndpoint');
@@ -214,11 +212,6 @@ class AIChat {
             this.animateInputField();
         });
 
-        this.temperatureSlider.addEventListener('input', () => {
-            this.updateTemperatureDisplay();
-            this.animateTemperatureSlider();
-        });
-
         this.apiSelector.addEventListener('change', () => this.switchApi());
         this.modelBadge.addEventListener('change', () => this.updateModelBadge());
 
@@ -275,13 +268,7 @@ class AIChat {
         }, 150);
     }
 
-    animateTemperatureSlider() {
-        const slider = this.temperatureSlider;
-        slider.style.transform = 'scale(1.05)';
-        setTimeout(() => {
-            slider.style.transform = 'scale(1)';
-        }, 200);
-    }
+
 
     animateQuickPrompt(button) {
         button.style.transform = 'scale(0.95)';
@@ -374,8 +361,6 @@ class AIChat {
             
             // Update UI elements
             this.apiEndpoint.value = config.endpoint;
-            this.temperatureSlider.value = config.temperatureRange.default;
-            this.updateTemperatureDisplay();
             this.updateModelBadge();
             
             // Animate the switch
@@ -634,24 +619,11 @@ class AIChat {
         }, 200);
     }
 
-    updateTemperatureDisplay() {
-        const temp = this.temperatureSlider.value;
-        this.tempValue.textContent = temp;
-        this.settings.temperature = parseFloat(temp);
-        this.saveSettings();
-        
-        // Animate temperature display
-        this.tempValue.style.transform = 'scale(1.2)';
-        setTimeout(() => {
-            this.tempValue.style.transform = 'scale(1)';
-        }, 200);
-    }
-
     updateModelBadge() {
         const selectedApi = this.apiSelector.value;
         const config = this.modelConfigs[selectedApi];
         if (config) {
-            this.modelBadge.textContent = config.defaultModel.split('-')[0] + ' API';
+            this.modelBadge.textContent = config.description;
         }
         this.settings.model = config ? config.defaultModel : 'qwen2.5-72b-instruct';
     }
@@ -1128,13 +1100,11 @@ class AIChat {
         
         // Apply settings with animations
         document.documentElement.setAttribute('data-theme', this.settings.theme);
-        this.temperatureSlider.value = this.settings.temperature;
-        this.apiSelector.value = this.settings.model;
+        this.apiSelector.value = this.settings.modelType;
         this.apiEndpoint.value = this.settings.apiEndpoint;
         this.apiKey.value = this.settings.apiKey;
         
         // Update UI with animations
-        this.updateTemperatureDisplay();
         this.updateModelBadge();
         this.themeToggle.innerHTML = this.settings.theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     }
@@ -1155,13 +1125,7 @@ class AIChat {
         this.showToast('Model updated', 'success');
     }
 
-    setTemperature(temp) {
-        this.settings.temperature = temp;
-        this.temperatureSlider.value = temp;
-        this.updateTemperatureDisplay();
-        this.saveSettings();
-        this.showToast('Temperature updated', 'success');
-    }
+
 
     setMaxLength(length) {
         this.settings.maxLength = length;
@@ -1220,7 +1184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Available commands:');
         console.log('- window.aiChat.setApiEndpoint("your-endpoint")');
         console.log('- window.aiChat.setModel("model-name")');
-        console.log('- window.aiChat.setTemperature(0.6)');
         console.log('- window.aiChat.setMaxLength(32768)');
     }, 1000);
 });
