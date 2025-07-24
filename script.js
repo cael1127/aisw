@@ -16,8 +16,7 @@ class AIChat {
         this.sendButton = document.getElementById('sendButton');
         this.temperatureSlider = document.getElementById('temperature');
         this.tempValue = document.getElementById('tempValue');
-        this.modelType = document.getElementById('modelType');
-        this.modelSelect = document.getElementById('modelSelect');
+        this.apiSelector = document.getElementById('apiSelector');
         this.maxLength = document.getElementById('maxLength');
         this.apiEndpoint = document.getElementById('apiEndpoint');
         this.apiKey = document.getElementById('apiKey');
@@ -73,16 +72,6 @@ class AIChat {
 
         // Model configurations
         this.modelConfigs = {
-            deepseek: {
-                endpoint: 'http://localhost:8000/v1/chat/completions',
-                models: [
-                    'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
-                    'deepseek-ai/DeepSeek-R1-Distill-Llama-32B'
-                ],
-                defaultModel: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
-                temperatureRange: { min: 0.5, max: 0.7, default: 0.6 },
-                description: 'Local DeepSeek-R1-Distill models (vLLM/SGLang)'
-            },
             qwen: {
                 endpoint: 'https://api.deepseek.com/v1/chat/completions',
                 models: [
@@ -97,7 +86,7 @@ class AIChat {
                 ],
                 defaultModel: 'qwen2.5-72b-instruct',
                 temperatureRange: { min: 0.1, max: 1.0, default: 0.7 },
-                description: 'Qwen models via DeepSeek API (Primary)',
+                description: 'Qwen Models via DeepSeek API (Primary)',
                 apiKeyEnv: 'QWEN_API_KEY'
             },
             qwen2: {
@@ -114,7 +103,7 @@ class AIChat {
                 ],
                 defaultModel: 'qwen2.5-72b-instruct',
                 temperatureRange: { min: 0.1, max: 1.0, default: 0.7 },
-                description: 'Qwen models via DeepSeek API (Secondary)',
+                description: 'Qwen Models via DeepSeek API (Secondary)',
                 apiKeyEnv: 'QWEN2_API_KEY'
             }
         };
@@ -230,8 +219,8 @@ class AIChat {
             this.animateTemperatureSlider();
         });
 
-        this.modelType.addEventListener('change', () => this.switchModelType());
-        this.modelSelect.addEventListener('change', () => this.updateModelBadge());
+        this.apiSelector.addEventListener('change', () => this.switchApi());
+        this.modelBadge.addEventListener('change', () => this.updateModelBadge());
 
         // Voice input with enhanced feedback
         this.voiceInput.addEventListener('click', () => this.toggleVoiceInput());
@@ -370,35 +359,37 @@ class AIChat {
         document.getElementById('clearData').addEventListener('click', () => this.clearAllData());
     }
 
-    switchModelType() {
-        const modelType = this.settings.modelType;
-        const config = this.modelConfigs[modelType];
+
+
+    switchApi() {
+        const selectedApi = this.apiSelector.value;
+        this.settings.modelType = selectedApi;
         
-        // Animate model switching
-        this.animateModelSwitch();
+        // Update model configuration based on selected API
+        const config = this.modelConfigs[selectedApi];
+        if (config) {
+            this.settings.apiEndpoint = config.endpoint;
+            this.settings.model = config.defaultModel;
+            this.settings.temperature = config.temperatureRange.default;
+            
+            // Update UI elements
+            this.apiEndpoint.value = config.endpoint;
+            this.temperatureSlider.value = config.temperatureRange.default;
+            this.updateTemperatureDisplay();
+            this.updateModelBadge();
+            
+            // Animate the switch
+            this.animateModelSwitch();
+            
+            // Show success message
+            this.showToast(`Switched to ${config.description}`, 'success');
+        }
         
-        // Update API endpoint
-        this.apiEndpoint.value = config.endpoint;
-        this.settings.apiEndpoint = config.endpoint;
-        
-        // Update model options with animation
-        this.animateModelOptions(config);
-        
-        // Update model setting
-        this.settings.model = config.defaultModel;
-        
-        // Update temperature range with animation
-        this.animateTemperatureRange(config.temperatureRange);
-        
-        // Update UI
-        this.updateTemperatureDisplay();
-        this.updateModelBadge();
-        
-        this.showToast(`Switched to ${modelType.toUpperCase()} models`, 'success');
+        this.saveSettings();
     }
 
     animateModelSwitch() {
-        const modelSelect = this.modelSelect;
+        const modelSelect = this.apiSelector;
         modelSelect.style.transform = 'scale(0.95)';
         modelSelect.style.opacity = '0.7';
         
@@ -408,46 +399,7 @@ class AIChat {
         }, 300);
     }
 
-    animateModelOptions(config) {
-        const modelSelect = this.modelSelect;
-        modelSelect.innerHTML = '';
-        
-        config.models.forEach((model, index) => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            if (model === config.defaultModel) {
-                option.selected = true;
-            }
-            modelSelect.appendChild(option);
-            
-            // Animate each option appearance
-            setTimeout(() => {
-                option.style.opacity = '0';
-                option.style.transform = 'translateY(-10px)';
-                option.style.transition = 'all 0.3s ease';
-                
-                setTimeout(() => {
-                    option.style.opacity = '1';
-                    option.style.transform = 'translateY(0)';
-                }, 50);
-            }, index * 50);
-        });
-    }
 
-    animateTemperatureRange(range) {
-        const slider = this.temperatureSlider;
-        slider.min = range.min;
-        slider.max = range.max;
-        slider.value = range.default;
-        this.settings.temperature = range.default;
-        
-        // Animate slider change
-        slider.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-            slider.style.transform = 'scale(1)';
-        }, 200);
-    }
 
     async sendMessage() {
         const message = this.userInput.value.trim();
@@ -517,28 +469,22 @@ class AIChat {
     }
 
     prepareRequest(message) {
-        const isDeepSeek = this.settings.modelType === 'deepseek';
-        
         const requestBody = {
             model: this.settings.model,
             messages: [
                 {
+                    role: "system",
+                    content: "You are a helpful AI assistant. Please provide clear, step-by-step explanations when appropriate."
+                },
+                {
                     role: "user",
-                    content: isDeepSeek ? this.formatDeepSeekPrompt(message) : message
+                    content: message
                 }
             ],
             temperature: this.settings.temperature,
             max_tokens: this.settings.maxLength,
             stream: false
         };
-
-        // Add system message for Qwen models
-        if (!isDeepSeek) {
-            requestBody.messages.unshift({
-                role: "system",
-                content: "You are a helpful AI assistant. Please provide clear, step-by-step explanations when appropriate."
-            });
-        }
 
         return requestBody;
     }
@@ -555,27 +501,6 @@ class AIChat {
         }
 
         return headers;
-    }
-
-    formatDeepSeekPrompt(message) {
-        // Following DeepSeek-R1-Distill official guidelines
-        let formattedMessage = message;
-        
-        // Check if it's a math problem
-        const mathKeywords = ['solve', 'calculate', 'compute', 'find', 'what is', 'equation', 'percentage', 'percent', 'math', 'mathematical'];
-        const isMathProblem = mathKeywords.some(keyword => 
-            message.toLowerCase().includes(keyword)
-        );
-        
-        if (isMathProblem) {
-            formattedMessage = `Please reason step by step, and put your final answer within \\boxed{}.\n\n${message}`;
-        }
-        
-        // Force thinking pattern for DeepSeek-R1-Distill (official recommendation)
-        // This ensures the model engages in thorough reasoning
-        formattedMessage = `<think>\n${formattedMessage}`;
-        
-        return formattedMessage;
     }
 
     addMessage(content, role) {
@@ -723,16 +648,12 @@ class AIChat {
     }
 
     updateModelBadge() {
-        const selectedModel = this.modelSelect.value;
-        this.modelBadge.textContent = selectedModel.split('/').pop() || selectedModel;
-        this.settings.model = selectedModel;
-        this.saveSettings();
-        
-        // Animate model badge
-        this.modelBadge.style.transform = 'scale(1.1) rotate(5deg)';
-        setTimeout(() => {
-            this.modelBadge.style.transform = 'scale(1) rotate(0deg)';
-        }, 300);
+        const selectedApi = this.apiSelector.value;
+        const config = this.modelConfigs[selectedApi];
+        if (config) {
+            this.modelBadge.textContent = config.defaultModel.split('-')[0] + ' API';
+        }
+        this.settings.model = config ? config.defaultModel : 'qwen2.5-72b-instruct';
     }
 
     updateConnectionStatus(status) {
@@ -1208,7 +1129,7 @@ class AIChat {
         // Apply settings with animations
         document.documentElement.setAttribute('data-theme', this.settings.theme);
         this.temperatureSlider.value = this.settings.temperature;
-        this.modelType.value = this.settings.modelType;
+        this.apiSelector.value = this.settings.model;
         this.apiEndpoint.value = this.settings.apiEndpoint;
         this.apiKey.value = this.settings.apiKey;
         
@@ -1228,7 +1149,7 @@ class AIChat {
 
     setModel(model) {
         this.settings.model = model;
-        this.modelSelect.value = model;
+        this.apiSelector.value = model;
         this.updateModelBadge();
         this.saveSettings();
         this.showToast('Model updated', 'success');
