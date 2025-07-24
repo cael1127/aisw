@@ -3,9 +3,12 @@ class ChatApp {
         this.messages = [];
         this.isLoading = false;
         this.conversationId = this.generateConversationId();
+        this.conversations = {};
         this.initializeElements();
         this.initializeEventListeners();
+        this.loadAllConversations();
         this.loadConversationHistory();
+        this.renderConversationsList();
         this.checkForOldContent();
     }
 
@@ -45,6 +48,10 @@ class ChatApp {
         this.sendButton = document.getElementById('sendButton');
         this.clearChatButton = document.getElementById('clearChat');
         this.exportChatButton = document.getElementById('exportChat');
+        this.newChatBtn = document.getElementById('newChatBtn');
+        this.sidebarToggle = document.getElementById('sidebarToggle');
+        this.sidebar = document.getElementById('sidebar');
+        this.conversationsList = document.getElementById('conversationsList');
     }
 
     initializeEventListeners() {
@@ -68,11 +75,146 @@ class ChatApp {
         if (this.exportChatButton) {
             this.exportChatButton.addEventListener('click', () => this.exportConversation());
         }
+
+        // New chat button
+        if (this.newChatBtn) {
+            this.newChatBtn.addEventListener('click', () => this.createNewChat());
+        }
+
+        // Sidebar toggle
+        if (this.sidebarToggle) {
+            this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !this.sidebar.contains(e.target) && 
+                !this.sidebarToggle.contains(e.target)) {
+                this.closeSidebar();
+            }
+        });
     }
 
-    autoResizeTextarea() {
-        this.userInput.style.height = 'auto';
-        this.userInput.style.height = Math.min(this.userInput.scrollHeight, 200) + 'px';
+    toggleSidebar() {
+        this.sidebar.classList.toggle('open');
+    }
+
+    closeSidebar() {
+        this.sidebar.classList.remove('open');
+    }
+
+    createNewChat() {
+        // Save current conversation
+        this.saveConversationHistory();
+        
+        // Create new conversation
+        this.conversationId = this.generateConversationId();
+        this.messages = [];
+        
+        // Clear messages display
+        this.messagesContainer.innerHTML = `
+            <div class="message system">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-author">AI Assistant</span>
+                    </div>
+                    <div class="message-text">
+                        <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Update conversations list
+        this.renderConversationsList();
+        this.closeSidebar();
+    }
+
+    switchConversation(conversationId) {
+        // Save current conversation
+        this.saveConversationHistory();
+        
+        // Load selected conversation
+        this.conversationId = conversationId;
+        this.loadConversationHistory();
+        
+        // Update UI
+        this.renderConversationsList();
+        this.closeSidebar();
+    }
+
+    deleteConversation(conversationId, event) {
+        event.stopPropagation();
+        
+        if (confirm('Are you sure you want to delete this conversation?')) {
+            // Remove from storage
+            const conversations = this.getStoredConversations();
+            delete conversations[conversationId];
+            localStorage.setItem('ai_chat_conversations', JSON.stringify(conversations));
+            
+            // If deleting current conversation, create new one
+            if (conversationId === this.conversationId) {
+                this.createNewChat();
+            } else {
+                // Just update the list
+                this.renderConversationsList();
+            }
+        }
+    }
+
+    renderConversationsList() {
+        this.conversationsList.innerHTML = '';
+        
+        const conversations = this.getStoredConversations();
+        const sortedConversations = Object.values(conversations)
+            .sort((a, b) => b.timestamp - a.timestamp);
+        
+        sortedConversations.forEach(conversation => {
+            const conversationItem = document.createElement('div');
+            conversationItem.className = `conversation-item ${conversation.id === this.conversationId ? 'active' : ''}`;
+            conversationItem.addEventListener('click', () => this.switchConversation(conversation.id));
+            
+            const title = document.createElement('div');
+            title.className = 'conversation-title';
+            title.textContent = conversation.title || 'New Conversation';
+            
+            const date = document.createElement('div');
+            date.className = 'conversation-date';
+            date.textContent = this.formatDate(conversation.timestamp);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.addEventListener('click', (e) => this.deleteConversation(conversation.id, e));
+            
+            conversationItem.appendChild(title);
+            conversationItem.appendChild(date);
+            conversationItem.appendChild(deleteBtn);
+            
+            this.conversationsList.appendChild(conversationItem);
+        });
+    }
+
+    formatDate(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 24 * 60 * 60 * 1000) { // Less than 24 hours
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (diff < 7 * 24 * 60 * 60 * 1000) { // Less than 7 days
+            return date.toLocaleDateString([], { weekday: 'short' });
+        } else {
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+    }
+
+    loadAllConversations() {
+        this.conversations = this.getStoredConversations();
     }
 
     // Memory Management Functions
@@ -88,9 +230,9 @@ class ChatApp {
         const conversations = this.getStoredConversations();
         conversations[this.conversationId] = conversationData;
         
-        // Keep only last 10 conversations to prevent storage bloat
+        // Keep only last 20 conversations to prevent storage bloat
         const conversationIds = Object.keys(conversations);
-        if (conversationIds.length > 10) {
+        if (conversationIds.length > 20) {
             const oldestId = conversationIds.sort((a, b) => 
                 conversations[a].timestamp - conversations[b].timestamp
             )[0];
@@ -107,6 +249,23 @@ class ChatApp {
         if (currentConversation && currentConversation.messages.length > 0) {
             this.messages = currentConversation.messages;
             this.displayStoredMessages();
+        } else {
+            this.messages = [];
+            this.messagesContainer.innerHTML = `
+                <div class="message system">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">AI Assistant</span>
+                        </div>
+                        <div class="message-text">
+                            <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
     }
 
@@ -138,6 +297,11 @@ class ChatApp {
             return content.length > 50 ? content.substring(0, 50) + '...' : content;
         }
         return 'New Conversation';
+    }
+
+    autoResizeTextarea() {
+        this.userInput.style.height = 'auto';
+        this.userInput.style.height = Math.min(this.userInput.scrollHeight, 200) + 'px';
     }
 
     // Enhanced message display function
@@ -202,6 +366,7 @@ class ChatApp {
         this.messages.push({ type: 'user', content: message, timestamp: Date.now() });
         this.displayMessage('user', message);
         this.saveConversationHistory();
+        this.renderConversationsList(); // Update sidebar
 
         this.userInput.value = '';
         this.autoResizeTextarea();
@@ -217,12 +382,14 @@ class ChatApp {
             this.messages.push({ type: 'assistant', content: response, timestamp: Date.now() });
             this.displayMessage('assistant', response);
             this.saveConversationHistory();
+            this.renderConversationsList(); // Update sidebar
         } catch (error) {
             this.hideTyping();
             const errorMessage = 'Sorry, I encountered an error. Please try again.';
             this.messages.push({ type: 'assistant', content: errorMessage, timestamp: Date.now() });
             this.displayMessage('assistant', errorMessage);
             this.saveConversationHistory();
+            this.renderConversationsList(); // Update sidebar
             console.error('API Error:', error);
         }
     }
@@ -334,6 +501,7 @@ class ChatApp {
                 </div>
             `;
             this.saveConversationHistory();
+            this.renderConversationsList();
         }
     }
 
