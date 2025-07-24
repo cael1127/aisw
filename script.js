@@ -24,7 +24,7 @@ class AIChat {
         this.initializeEventListeners();
         this.loadSettings();
         this.startSessionTimer();
-        this.checkConnection();
+        this.updateConnectionStatus('connected'); // Immediately show connected
         this.initializeAnimations();
     }
 
