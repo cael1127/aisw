@@ -38,6 +38,7 @@ class ChatApp {
         this.userInput = document.getElementById('userInput');
         this.sendButton = document.getElementById('sendButton');
         this.apiSelector = document.getElementById('apiSelector');
+        this.copyCodeButton = document.getElementById('copyCode');
     }
 
     initializeEventListeners() {
@@ -48,6 +49,86 @@ class ChatApp {
                 this.sendMessage();
             }
         });
+
+        // Tab functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => this.switchTab(button.dataset.tab));
+        });
+
+        // Quick actions
+        document.querySelectorAll('.quick-action').forEach(button => {
+            button.addEventListener('click', () => this.handleQuickAction(button.dataset.action));
+        });
+
+        // Copy code functionality
+        if (this.copyCodeButton) {
+            this.copyCodeButton.addEventListener('click', () => this.copyCode());
+        }
+    }
+
+    switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.toggle('active', button.dataset.tab === tabName);
+        });
+
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === `${tabName}-tab`);
+        });
+    }
+
+    handleQuickAction(action) {
+        switch (action) {
+            case 'clear':
+                this.clearChat();
+                break;
+            case 'export':
+                this.exportChat();
+                break;
+        }
+    }
+
+    clearChat() {
+        if (confirm('Are you sure you want to clear the chat?')) {
+            this.messagesContainer.innerHTML = `
+                <div class="message system">
+                    <div class="message-content">
+                        <p>Chat cleared! Start a new conversation.</p>
+                    </div>
+                </div>
+            `;
+            this.messages = [];
+        }
+    }
+
+    exportChat() {
+        const chatText = this.messages.map(msg => 
+            `${msg.role.toUpperCase()}: ${msg.content}`
+        ).join('\n\n');
+        
+        const blob = new Blob([chatText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chat-export-${new Date().toISOString().split('T')[0]}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    copyCode() {
+        const codeBlock = document.getElementById('codeBlock');
+        if (codeBlock) {
+            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+                const originalText = this.copyCodeButton.innerHTML;
+                this.copyCodeButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    this.copyCodeButton.innerHTML = originalText;
+                }, 2000);
+            }).catch(() => {
+                alert('Failed to copy code to clipboard');
+            });
+        }
     }
 
     async sendMessage() {
