@@ -13,7 +13,7 @@ exports.handler = async (event, context) => {
     // Parse the request body
     const requestBody = JSON.parse(event.body);
     
-    // Determine which API key to use based on the endpoint or model type
+    // Determine which API key to use based on the endpoint
     let apiKey;
     const endpoint = requestBody.endpoint || '';
     
@@ -21,10 +21,23 @@ exports.handler = async (event, context) => {
     if (endpoint.includes('localhost:8000')) {
       apiKey = 'local'; // No API key needed for local models
     } else {
-      // For API endpoints, determine which key to use
-      // You can add logic here to determine which API key based on model or other criteria
-      // For now, we'll use QWEN_API_KEY as default, QWEN2_API_KEY as fallback
+      // For API endpoints, use the primary API key first, then fallback to secondary
       apiKey = process.env.QWEN_API_KEY || process.env.QWEN2_API_KEY;
+      
+      if (!apiKey) {
+        return {
+          statusCode: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS'
+          },
+          body: JSON.stringify({ 
+            error: 'No API key configured. Please set QWEN_API_KEY or QWEN2_API_KEY environment variable.' 
+          })
+        };
+      }
     }
     
     if (!apiKey || apiKey === 'local') {
