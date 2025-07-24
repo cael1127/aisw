@@ -40,25 +40,11 @@ exports.handler = async function(event, context) {
             };
         }
 
-        // Determine which API key to use
-        let apiKey;
-        if (apiType === 'qwen') {
-            apiKey = process.env.QWEN_API_KEY;
-        } else if (apiType === 'qwen2') {
-            apiKey = process.env.QWEN2_API_KEY;
-        } else {
-            return {
-                statusCode: 400,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ error: 'Invalid API type' })
-            };
-        }
-
+        // Get Gemini API key
+        const apiKey = process.env.GEMINI_API_KEY;
+        
         if (!apiKey) {
-            console.error(`API key not found for ${apiType}`);
+            console.error('Gemini API key not found');
             return {
                 statusCode: 500,
                 headers: {
@@ -66,41 +52,35 @@ exports.handler = async function(event, context) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    error: `API key not configured for ${apiType}. Please check your Netlify environment variables.` 
+                    error: 'Gemini API key not configured. Please check your Netlify environment variables.' 
                 })
             };
         }
 
-        console.log(`Making API call with ${apiType} key`);
+        console.log('Making Gemini API call');
 
-        // Make the API call to DeepSeek
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        // Make the API call to Google Gemini
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: 'qwen2.5-72b-instruct',
-                messages: [
+                contents: [
                     {
-                        role: 'system',
-                        content: 'You are a helpful AI assistant. Please provide clear, step-by-step explanations when appropriate.'
-                    },
-                    {
-                        role: 'user',
-                        content: message
+                        parts: [
+                            {
+                                text: message
+                            }
+                        ]
                     }
-                ],
-                temperature: 0.7,
-                max_tokens: 4000,
-                stream: false
+                ]
             })
         });
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('API Error:', errorText);
+            console.error('Gemini API Error:', errorText);
             return {
                 statusCode: response.status,
                 headers: {
@@ -108,12 +88,28 @@ exports.handler = async function(event, context) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    error: `API request failed: ${response.status} - ${errorText}` 
+                    error: `Gemini API request failed: ${response.status} - ${errorText}` 
                 })
             };
         }
 
         const data = await response.json();
+        
+        // Extract the response text from Gemini's response format
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!responseText) {
+            return {
+                statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    error: 'No response text received from Gemini API' 
+                })
+            };
+        }
         
         return {
             statusCode: 200,
@@ -122,7 +118,7 @@ exports.handler = async function(event, context) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                response: data.choices[0].message.content
+                response: responseText
             })
         };
 

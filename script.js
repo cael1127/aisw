@@ -46,8 +46,6 @@ class ChatApp {
     }
 
     async callAPI(message) {
-        const selectedAPI = this.apiSelector.value;
-        
         const response = await fetch('/.netlify/functions/api-proxy', {
             method: 'POST',
             headers: {
@@ -55,7 +53,7 @@ class ChatApp {
             },
             body: JSON.stringify({
                 message: message,
-                apiType: selectedAPI
+                apiType: 'gemini'
             })
         });
 
