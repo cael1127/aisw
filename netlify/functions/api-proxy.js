@@ -1,10 +1,27 @@
 const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
+    // Handle CORS preflight requests
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+            },
+            body: ''
+        };
+    }
+
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ error: 'Method not allowed' })
         };
     }
@@ -15,6 +32,10 @@ exports.handler = async function(event, context) {
         if (!message) {
             return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({ error: 'Message is required' })
             };
         }
@@ -28,16 +49,29 @@ exports.handler = async function(event, context) {
         } else {
             return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({ error: 'Invalid API type' })
             };
         }
 
         if (!apiKey) {
+            console.error(`API key not found for ${apiType}`);
             return {
                 statusCode: 500,
-                body: JSON.stringify({ error: `API key not configured for ${apiType}` })
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    error: `API key not configured for ${apiType}. Please check your Netlify environment variables.` 
+                })
             };
         }
+
+        console.log(`Making API call with ${apiType} key`);
 
         // Make the API call to DeepSeek
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -69,7 +103,13 @@ exports.handler = async function(event, context) {
             console.error('API Error:', errorText);
             return {
                 statusCode: response.status,
-                body: JSON.stringify({ error: 'API request failed' })
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    error: `API request failed: ${response.status} - ${errorText}` 
+                })
             };
         }
 
@@ -78,6 +118,7 @@ exports.handler = async function(event, context) {
         return {
             statusCode: 200,
             headers: {
+                'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -89,7 +130,13 @@ exports.handler = async function(event, context) {
         console.error('Function error:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Internal server error' })
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                error: `Internal server error: ${error.message}` 
+            })
         };
     }
 }; 
