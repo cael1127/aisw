@@ -4,6 +4,36 @@ class ChatApp {
         this.isLoading = false;
         this.initializeElements();
         this.initializeEventListeners();
+        this.checkForOldContent();
+    }
+
+    checkForOldContent() {
+        // Check if old content is being displayed (indicating cache issues)
+        const messagesContainer = document.getElementById('messages');
+        if (!messagesContainer) {
+            console.log('Messages container not found, forcing reload...');
+            window.location.reload(true);
+            return;
+        }
+
+        // Check if we're showing the old welcome message
+        const welcomeMessage = messagesContainer.querySelector('.message-content p');
+        if (welcomeMessage && welcomeMessage.textContent.includes('Choose an API above')) {
+            console.log('Old welcome message detected, forcing reload...');
+            window.location.reload(true);
+            return;
+        }
+
+        // Check if old API selector options exist
+        const apiSelector = document.getElementById('apiSelector');
+        if (apiSelector) {
+            const options = Array.from(apiSelector.options).map(opt => opt.value);
+            if (options.includes('qwen') || options.includes('qwen2')) {
+                console.log('Old API options detected, forcing reload...');
+                window.location.reload(true);
+                return;
+            }
+        }
     }
 
     initializeElements() {
