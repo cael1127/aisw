@@ -26,6 +26,7 @@ body {
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
 .sidebar-header {
@@ -120,7 +121,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-width: calc(100% - 260px);
+    min-width: 0;
 }
 
 .sidebar-toggle {
@@ -220,6 +221,7 @@ body {
     margin: 0 auto;
     width: 100%;
     height: calc(100vh - 60px);
+    padding: 0 1rem;
 }
 
 .chat-container {
@@ -461,5 +463,54 @@ body {
     
     .input-field {
         margin: 0 0.5rem 0.5rem 0.5rem;
+    }
+}
+
+/* Desktop styles - ensure proper desktop layout */
+@media (min-width: 769px) {
+    .sidebar {
+        width: 260px;
+        position: relative;
+        transform: none;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .main-area {
+        max-width: calc(100% - 260px);
+        flex: 1;
+    }
+
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        height: 100vh;
+        display: flex;
+    }
+
+    .header {
+        padding: 0.75rem 1rem;
+    }
+
+    .main-content {
+        max-width: 768px;
+        margin: 0 auto;
+        width: 100%;
+        height: calc(100vh - 60px);
+        padding: 0;
+    }
+
+    .message {
+        padding: 1.5rem 1rem;
+    }
+
+    .input-container {
+        padding: 1rem;
+    }
+
+    .input-field {
+        margin: 0;
     }
 } 
