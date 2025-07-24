@@ -1,0 +1,27 @@
+{
+  "name": "ai-chat-interface",
+  "version": "1.0.0",
+  "description": "Professional AI Chat Interface with DeepSeek and Qwen models",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.0.0"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "deepseek",
+    "qwen",
+    "netlify",
+    "serverless"
+  ],
+  "author": "AI Chat Interface",
+  "license": "MIT"
+} 

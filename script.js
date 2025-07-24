@@ -95,10 +95,27 @@ class AIChat {
                     'qwen2-7b-instruct'
                 ],
                 defaultModel: 'qwen2.5-72b-instruct',
-                temperatureRange: { min: 0.1, max: 1.0, default: 0.7 },
-                apiKey: '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'
+                temperatureRange: { min: 0.1, max: 1.0, default: 0.7 }
             }
         };
+    }
+
+    // Get API key from environment variables or user input
+    getApiKey() {
+        // First try to get from environment variable (for production)
+        if (typeof process !== 'undefined' && process.env) {
+            return process.env.DEEPSEEK_API_KEY || process.env.QWEN_API_KEY || '';
+        }
+        
+        // Fallback to user input (for development)
+        return this.settings.apiKey || '';
+    }
+
+    // Get environment variable (for client-side use)
+    getEnvVar(varName) {
+        // For client-side, we'll use a different approach
+        // This will be handled by Netlify's environment variables
+        return '';
     }
 
     initializeAnimations() {
@@ -351,12 +368,6 @@ class AIChat {
         // Update temperature range with animation
         this.animateTemperatureRange(config.temperatureRange);
         
-        // Update API key for Qwen
-        if (modelType === 'qwen') {
-            this.apiKey.value = config.apiKey;
-            this.settings.apiKey = config.apiKey;
-        }
-        
         // Update UI
         this.updateTemperatureDisplay();
         this.updateModelBadge();
@@ -431,12 +442,17 @@ class AIChat {
 
         try {
             const requestBody = this.prepareRequest(message);
-            const headers = this.prepareHeaders();
             
-            const response = await fetch(this.settings.apiEndpoint, {
+            // Use Netlify function for secure API calls
+            const response = await fetch('/.netlify/functions/api-proxy', {
                 method: 'POST',
-                headers,
-                body: JSON.stringify(requestBody)
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    endpoint: this.settings.apiEndpoint,
+                    ...requestBody
+                })
             });
 
             if (!response.ok) {
@@ -444,6 +460,11 @@ class AIChat {
             }
 
             const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
             const assistantMessage = data.choices[0].message.content;
             
             // Remove loading indicator and add assistant response with animation
@@ -505,8 +526,10 @@ class AIChat {
             'Content-Type': 'application/json',
         };
 
-        if (this.settings.apiKey) {
-            headers['Authorization'] = `Bearer ${this.settings.apiKey}`;
+        // Get API key from user input or environment variable
+        const apiKey = this.getApiKey();
+        if (apiKey) {
+            headers['Authorization'] = `Bearer ${apiKey}`;
         }
 
         return headers;
@@ -713,13 +736,19 @@ class AIChat {
 
     async checkConnection() {
         try {
-            const endpoint = this.settings.apiEndpoint;
-            const testUrl = endpoint.includes('deepseek.com') 
-                ? 'https://api.deepseek.com/v1/models'
-                : endpoint.replace('/chat/completions', '/models');
-            
-            const response = await fetch(testUrl, {
-                headers: this.settings.apiKey ? { 'Authorization': `Bearer ${this.settings.apiKey}` } : {}
+            // Use Netlify function for secure connection check
+            const response = await fetch('/.netlify/functions/api-proxy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    endpoint: this.settings.apiEndpoint,
+                    model: this.settings.model,
+                    messages: [{ role: 'user', content: 'test' }],
+                    temperature: 0.1,
+                    max_tokens: 10
+                })
             });
             
             if (response.ok) {
