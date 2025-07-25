@@ -792,7 +792,7 @@ class ChatApp {
         this.messages.push({ type: 'user', content: message, timestamp: Date.now() });
         this.displayMessage('user', message);
         this.saveConversationHistory();
-        this.renderConversationsList(); // Update sidebar
+        this.renderConversationsList(); // Update sidebar with reordering
 
         this.userInput.value = '';
         this.autoResizeTextarea();
@@ -809,14 +809,14 @@ class ChatApp {
             this.messages.push({ type: 'assistant', content: response, timestamp: Date.now() });
             this.displayMessage('assistant', response);
             this.saveConversationHistory();
-            this.renderConversationsList(); // Update sidebar
+            this.renderConversationsList(); // Update sidebar with reordering
         } catch (error) {
             this.hideTyping();
             const errorMessage = `Sorry, I encountered an error: ${error.message}. Please try again or switch to a different model.`;
             this.messages.push({ type: 'assistant', content: errorMessage, timestamp: Date.now() });
             this.displayMessage('assistant', errorMessage);
             this.saveConversationHistory();
-            this.renderConversationsList(); // Update sidebar
+            this.renderConversationsList(); // Update sidebar with reordering
             console.error('API Error:', error);
         }
     }
@@ -992,7 +992,7 @@ Conversation Context:
             </div>
         `;
         
-        // Update conversations list
+        // Update conversations list with reordering (new chat should be at top)
         this.renderConversationsList();
         this.closeSidebar();
     }
@@ -1005,8 +1005,8 @@ Conversation Context:
         this.conversationId = conversationId;
         this.loadConversationHistory();
         
-        // Update UI
-        this.renderConversationsList();
+        // Update UI without reordering
+        this.updateConversationsList();
         this.closeSidebar();
         
         // Update conversation title in header
@@ -1026,8 +1026,8 @@ Conversation Context:
             if (conversationId === this.conversationId) {
                 this.createNewChat();
             } else {
-                // Just update the list
-                this.renderConversationsList();
+                // Just update the list without reordering
+                this.updateConversationsList();
             }
         }
     }
@@ -1180,6 +1180,19 @@ Conversation Context:
                 breadcrumbItem.textContent = currentConversation.title || 'Chat';
             }
         }
+    }
+
+    updateConversationsList() {
+        // Update only the active state without reordering
+        const conversationItems = this.conversationsList.querySelectorAll('.conversation-item');
+        conversationItems.forEach(item => {
+            const conversationId = item.getAttribute('data-conversation-id');
+            if (conversationId === this.conversationId) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
     }
 
     autoResizeTextarea() {
