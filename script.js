@@ -62,7 +62,6 @@ class ChatApp {
         this.inputStats = document.getElementById('inputStats');
         
         // Advanced features
-        this.modelSelect = document.getElementById('modelSelect');
         this.codeExecBtn = document.getElementById('codeExec');
         this.settingsBtn = document.getElementById('settings');
         this.collabBtn = document.getElementById('collabBtn');
@@ -104,7 +103,6 @@ class ChatApp {
         
         // Settings elements
         this.closeSettingsModal = document.getElementById('closeSettingsModal');
-        this.defaultModel = document.getElementById('defaultModel');
         this.responseLength = document.getElementById('responseLength');
         this.creativityLevel = document.getElementById('creativityLevel');
         this.creativityValue = document.getElementById('creativityValue');
@@ -149,8 +147,6 @@ class ChatApp {
 
     loadSettings() {
         const defaultSettings = {
-            defaultModel: 'gemini',
-            currentModel: 'gemini',
             responseLength: 'medium',
             creativityLevel: 70,
             theme: 'dark',
@@ -176,12 +172,11 @@ class ChatApp {
         document.body.style.fontSize = this.settings.fontSize === 'small' ? '14px' : 
                                      this.settings.fontSize === 'large' ? '18px' : '16px';
         
-        // Update current model
-        this.currentModel = this.settings.currentModel || 'gemini';
+        // Model is fixed to Gemini
+        this.currentModel = 'gemini';
         this.updateModelDisplay();
         
         // Update UI elements
-        if (this.defaultModel) this.defaultModel.value = this.settings.defaultModel;
         if (this.responseLength) this.responseLength.value = this.settings.responseLength;
         if (this.creativityLevel) this.creativityLevel.value = this.settings.creativityLevel;
         if (this.creativityValue) this.creativityValue.textContent = this.settings.creativityLevel + '%';
@@ -200,10 +195,32 @@ class ChatApp {
     }
 
     setupCollaboration() {
-        // Simulate real-time collaboration
+        // Enhanced collaboration with more realistic data
         this.collaborationSessions = [
-            { id: 'session1', name: 'Project Alpha', participants: 3, lastActive: Date.now() - 300000 },
-            { id: 'session2', name: 'Code Review', participants: 2, lastActive: Date.now() - 600000 }
+            { 
+                id: 'session1', 
+                name: 'Project Alpha', 
+                participants: 3, 
+                lastActive: Date.now() - 300000,
+                description: 'Main development session',
+                status: 'active'
+            },
+            { 
+                id: 'session2', 
+                name: 'Code Review', 
+                participants: 2, 
+                lastActive: Date.now() - 600000,
+                description: 'Review session for new features',
+                status: 'active'
+            },
+            { 
+                id: 'session3', 
+                name: 'Brainstorming', 
+                participants: 1, 
+                lastActive: Date.now() - 1200000,
+                description: 'Ideation session',
+                status: 'idle'
+            }
         ];
         this.updateSessionsList();
     }
@@ -214,18 +231,40 @@ class ChatApp {
                 this.sessionsList.innerHTML = '<p class="no-sessions">No active sessions</p>';
             } else {
                 this.sessionsList.innerHTML = this.collaborationSessions.map(session => `
-                    <div class="session-item">
+                    <div class="session-item ${session.status}">
                         <div class="session-info">
                             <div class="session-name">${session.name}</div>
-                            <div class="session-details">${session.participants} participants</div>
+                            <div class="session-description">${session.description}</div>
+                            <div class="session-details">
+                                <span class="participants">👥 ${session.participants} participants</span>
+                                <span class="last-active">🕒 ${this.formatTimeAgo(session.lastActive)}</span>
+                            </div>
                         </div>
-                        <button class="join-session-btn" onclick="chatApp.joinSession('${session.id}')">
-                            Join
-                        </button>
+                        <div class="session-actions">
+                            <button class="join-session-btn" onclick="chatApp.joinSession('${session.id}')">
+                                <i class="fas fa-sign-in-alt"></i> Join
+                            </button>
+                            <button class="session-info-btn" onclick="chatApp.showSessionInfo('${session.id}')" title="Session Info">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             }
         }
+    }
+
+    formatTimeAgo(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+        
+        if (minutes < 1) return 'Just now';
+        if (minutes < 60) return `${minutes}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        return `${days}d ago`;
     }
 
     setupCodeExecution() {
@@ -233,29 +272,115 @@ class ChatApp {
         this.codeSandbox = {
             javascript: (code) => {
                 try {
-                    const result = eval(code);
+                    // Create a safe execution environment
+                    const sandbox = {
+                        console: {
+                            log: (...args) => args.join(' '),
+                            error: (...args) => args.join(' '),
+                            warn: (...args) => args.join(' '),
+                            info: (...args) => args.join(' ')
+                        },
+                        Math: Math,
+                        Date: Date,
+                        Array: Array,
+                        Object: Object,
+                        String: String,
+                        Number: Number,
+                        Boolean: Boolean,
+                        parseInt: parseInt,
+                        parseFloat: parseFloat,
+                        isNaN: isNaN,
+                        isFinite: isFinite,
+                        escape: escape,
+                        unescape: unescape,
+                        encodeURI: encodeURI,
+                        decodeURI: decodeURI,
+                        encodeURIComponent: encodeURIComponent,
+                        decodeURIComponent: decodeURIComponent
+                    };
+                    
+                    // Execute code in sandbox
+                    const result = new Function('console', 'Math', 'Date', 'Array', 'Object', 'String', 'Number', 'Boolean', 'parseInt', 'parseFloat', 'isNaN', 'isFinite', 'escape', 'unescape', 'encodeURI', 'decodeURI', 'encodeURIComponent', 'decodeURIComponent', code)
+                        (sandbox.console, sandbox.Math, sandbox.Date, sandbox.Array, sandbox.Object, sandbox.String, sandbox.Number, sandbox.Boolean, sandbox.parseInt, sandbox.parseFloat, sandbox.isNaN, sandbox.isFinite, sandbox.escape, sandbox.unescape, sandbox.encodeURI, sandbox.decodeURI, sandbox.encodeURIComponent, sandbox.decodeURIComponent);
+                    
                     return { success: true, result: result };
                 } catch (error) {
                     return { success: false, error: error.message };
                 }
             },
             html: (code) => {
-                return { success: true, result: code };
+                try {
+                    // Create a preview of the HTML
+                    const preview = `
+                        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: white; color: black;">
+                            <h4>HTML Preview:</h4>
+                            ${code}
+                        </div>
+                    `;
+                    return { success: true, result: preview };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
             },
             css: (code) => {
-                return { success: true, result: code };
+                try {
+                    // Create a preview of the CSS
+                    const preview = `
+                        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: white; color: black;">
+                            <h4>CSS Preview:</h4>
+                            <style>${code}</style>
+                            <div class="css-preview">
+                                <p>This is a sample text to demonstrate the CSS styling.</p>
+                                <button>Sample Button</button>
+                            </div>
+                        </div>
+                    `;
+                    return { success: true, result: preview };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
             },
             python: (code) => {
-                // Simulate Python execution
-                return { success: true, result: 'Python execution simulated: ' + code };
+                // Enhanced Python simulation
+                const pythonKeywords = ['print', 'def', 'class', 'import', 'from', 'if', 'else', 'elif', 'for', 'while', 'try', 'except', 'finally', 'with', 'as', 'in', 'is', 'not', 'and', 'or', 'True', 'False', 'None'];
+                const hasPythonKeywords = pythonKeywords.some(keyword => code.includes(keyword));
+                
+                if (hasPythonKeywords) {
+                    return { 
+                        success: true, 
+                        result: `Python code simulation:\n\n${code}\n\nOutput: Code would be executed in a Python environment.` 
+                    };
+                } else {
+                    return { success: false, error: 'Invalid Python syntax' };
+                }
             },
             sql: (code) => {
-                // Simulate SQL execution
-                return { success: true, result: 'SQL query executed: ' + code };
+                // Enhanced SQL simulation
+                const sqlKeywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'FROM', 'WHERE', 'JOIN', 'GROUP BY', 'ORDER BY', 'HAVING'];
+                const hasSQLKeywords = sqlKeywords.some(keyword => code.toUpperCase().includes(keyword));
+                
+                if (hasSQLKeywords) {
+                    return { 
+                        success: true, 
+                        result: `SQL query simulation:\n\n${code}\n\nResult: Query would be executed against a database.` 
+                    };
+                } else {
+                    return { success: false, error: 'Invalid SQL syntax' };
+                }
             },
             bash: (code) => {
-                // Simulate bash execution
-                return { success: true, result: 'Bash command executed: ' + code };
+                // Enhanced bash simulation
+                const bashKeywords = ['echo', 'ls', 'cd', 'mkdir', 'rm', 'cp', 'mv', 'cat', 'grep', 'find', 'chmod', 'chown', 'ps', 'kill', 'top', 'df', 'du'];
+                const hasBashKeywords = bashKeywords.some(keyword => code.includes(keyword));
+                
+                if (hasBashKeywords) {
+                    return { 
+                        success: true, 
+                        result: `Bash command simulation:\n\n${code}\n\nOutput: Command would be executed in a terminal.` 
+                    };
+                } else {
+                    return { success: false, error: 'Invalid bash command' };
+                }
             }
         };
     }
@@ -293,14 +418,8 @@ class ChatApp {
             this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
         }
 
-        // Model selection
-        if (this.modelSelect) {
-            this.modelSelect.addEventListener('change', (e) => {
-                this.currentModel = e.target.value;
-                this.updateModelDisplay();
-                this.saveSettings();
-            });
-        }
+        // Model is fixed to Gemini
+        this.currentModel = 'gemini';
 
         // Advanced feature buttons
         if (this.codeExecBtn) {
@@ -433,7 +552,6 @@ class ChatApp {
 
     setupSettingsControls() {
         const settingsElements = [
-            { element: this.defaultModel, setting: 'defaultModel' },
             { element: this.responseLength, setting: 'responseLength' },
             { element: this.themeSelect, setting: 'theme' },
             { element: this.fontSize, setting: 'fontSize' },
@@ -456,15 +574,7 @@ class ChatApp {
             }
         });
         
-        // Add model selector to settings
-        if (this.modelSelect) {
-            this.modelSelect.addEventListener('change', (e) => {
-                this.settings.currentModel = e.target.value;
-                this.currentModel = e.target.value;
-                this.saveSettings();
-                this.updateModelDisplay();
-            });
-        }
+        // Model is fixed to Gemini - no model switching
 
         if (this.creativityLevel) {
             this.creativityLevel.addEventListener('input', (e) => {
@@ -527,7 +637,7 @@ class ChatApp {
         const language = this.codeLanguage.value;
         
         if (!code) {
-            alert('Please enter some code to execute.');
+            this.showCodeOutput('❌ Please enter some code to execute.', 'error');
             return;
         }
         
@@ -535,30 +645,119 @@ class ChatApp {
         this.runCodeBtn.innerHTML = '<span class="loading"></span> Running...';
         
         setTimeout(() => {
-            const result = this.codeSandbox[language](code);
+            try {
+                const result = this.codeSandbox[language](code);
+                
+                if (result.success) {
+                    this.showCodeOutput(`✅ Execution successful:\n\n${result.result}`, 'success');
+                } else {
+                    this.showCodeOutput(`❌ Execution failed:\n\n${result.error}`, 'error');
+                }
+            } catch (error) {
+                this.showCodeOutput(`❌ Unexpected error:\n\n${error.message}`, 'error');
+            }
             
-            const output = result.success ? 
-                `✅ Execution successful:\n${result.result}` : 
-                `❌ Execution failed:\n${result.error}`;
-            
-            this.outputContent.textContent = output;
             this.runCodeBtn.disabled = false;
             this.runCodeBtn.innerHTML = '<i class="fas fa-play"></i> Run Code';
-        }, 1000);
+        }, 500);
+    }
+
+    showCodeOutput(content, type = 'info') {
+        const outputDiv = document.createElement('div');
+        outputDiv.className = `code-output-item ${type}`;
+        outputDiv.innerHTML = `
+            <div class="output-header">
+                <span class="output-type">${type.toUpperCase()}</span>
+                <span class="output-time">${new Date().toLocaleTimeString()}</span>
+            </div>
+            <div class="output-content">${content}</div>
+        `;
+        
+        this.outputContent.appendChild(outputDiv);
+        this.outputContent.scrollTop = this.outputContent.scrollHeight;
     }
 
     formatCode() {
         const code = this.codeInput.value.trim();
         if (!code) return;
         
-        // Simple code formatting (in a real app, you'd use a proper formatter)
-        const formatted = code
-            .replace(/\s+/g, ' ')
-            .replace(/\s*{\s*/g, ' {\n    ')
-            .replace(/\s*}\s*/g, '\n}\n')
-            .replace(/\s*;\s*/g, ';\n    ');
+        const language = this.codeLanguage.value;
+        let formatted = code;
+        
+        switch(language) {
+            case 'javascript':
+                formatted = this.formatJavaScript(code);
+                break;
+            case 'html':
+                formatted = this.formatHTML(code);
+                break;
+            case 'css':
+                formatted = this.formatCSS(code);
+                break;
+            case 'python':
+                formatted = this.formatPython(code);
+                break;
+            case 'sql':
+                formatted = this.formatSQL(code);
+                break;
+            default:
+                formatted = this.formatGeneric(code);
+        }
         
         this.codeInput.value = formatted;
+        this.showCodeOutput('✅ Code formatted successfully!', 'success');
+    }
+
+    formatJavaScript(code) {
+        return code
+            .replace(/\s*{\s*/g, ' {\n    ')
+            .replace(/\s*}\s*/g, '\n}\n')
+            .replace(/\s*;\s*/g, ';\n    ')
+            .replace(/\s*,\s*/g, ', ')
+            .replace(/\s*\(\s*/g, '(')
+            .replace(/\s*\)\s*/g, ')')
+            .replace(/\s*\[\s*/g, '[')
+            .replace(/\s*\]\s*/g, ']');
+    }
+
+    formatHTML(code) {
+        return code
+            .replace(/>\s*</g, '>\n<')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    formatCSS(code) {
+        return code
+            .replace(/\s*{\s*/g, ' {\n    ')
+            .replace(/\s*}\s*/g, '\n}\n')
+            .replace(/\s*;\s*/g, ';\n    ')
+            .replace(/\s*:\s*/g, ': ');
+    }
+
+    formatPython(code) {
+        return code
+            .replace(/\s*:\s*/g, ':\n    ')
+            .replace(/\s*,\s*/g, ', ')
+            .replace(/\s*\(\s*/g, '(')
+            .replace(/\s*\)\s*/g, ')');
+    }
+
+    formatSQL(code) {
+        return code
+            .replace(/\s+/g, ' ')
+            .replace(/\s*,\s*/g, ',\n    ')
+            .replace(/\s*FROM\s+/gi, '\nFROM ')
+            .replace(/\s*WHERE\s+/gi, '\nWHERE ')
+            .replace(/\s*ORDER BY\s+/gi, '\nORDER BY ')
+            .replace(/\s*GROUP BY\s+/gi, '\nGROUP BY ')
+            .toUpperCase();
+    }
+
+    formatGeneric(code) {
+        return code
+            .replace(/\s+/g, ' ')
+            .trim();
     }
 
     clearCode() {
@@ -597,8 +796,32 @@ class ChatApp {
     }
 
     joinSession(sessionId) {
-        alert(`Joining session: ${sessionId}`);
+        const session = this.collaborationSessions.find(s => s.id === sessionId);
+        if (session) {
+            session.participants++;
+            session.lastActive = Date.now();
+            this.updateSessionsList();
+            alert(`Successfully joined "${session.name}"! You are now participant #${session.participants}.`);
+        } else {
+            alert('Session not found.');
+        }
         this.closeCollabModal();
+    }
+
+    showSessionInfo(sessionId) {
+        const session = this.collaborationSessions.find(s => s.id === sessionId);
+        if (session) {
+            const info = `
+Session Information:
+- Name: ${session.name}
+- Description: ${session.description}
+- Participants: ${session.participants}
+- Status: ${session.status}
+- Last Active: ${this.formatTimeAgo(session.lastActive)}
+- Session ID: ${session.id}
+            `;
+            alert(info);
+        }
     }
 
     openDataAnalysis() {
@@ -609,31 +832,16 @@ class ChatApp {
     }
 
     updateModelDisplay() {
-        const modelNames = {
-            'gemini': 'Gemini 1.5 Flash',
-            'gpt4': 'GPT-4 Turbo',
-            'claude': 'Claude 3.5 Sonnet',
-            'custom': 'Custom Model'
-        };
-        
-        // Update UI elements that show the current model
-        const currentModelElement = document.getElementById('currentModel');
-        if (currentModelElement) {
-            currentModelElement.textContent = modelNames[this.currentModel];
-        }
-        
-        // Update model selector
-        if (this.modelSelect) {
-            this.modelSelect.value = this.currentModel;
-        }
+        // Model is fixed to Gemini
+        this.currentModel = 'gemini';
         
         // Update status in sidebar
         const statusModel = document.querySelector('.status-model');
         if (statusModel) {
-            statusModel.textContent = modelNames[this.currentModel];
+            statusModel.textContent = 'Google Gemini';
         }
         
-        console.log(`Switched to: ${modelNames[this.currentModel]}`);
+        console.log('ACF is powered by Google Gemini');
     }
 
     setupVoiceRecognition() {
@@ -643,13 +851,21 @@ class ChatApp {
             this.recognition.continuous = true;
             this.recognition.interimResults = true;
             this.recognition.lang = 'en-US';
+            this.recognition.maxAlternatives = 1;
             
             this.recognition.onstart = () => {
                 this.isRecording = true;
                 this.startVoiceBtn.classList.add('recording');
                 this.stopVoiceBtn.disabled = false;
                 this.startVoiceBtn.disabled = true;
-                this.voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><p>Listening...</p>';
+                this.voiceStatus.innerHTML = `
+                    <div class="voice-visualizer">
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                    </div>
+                    <p>Listening...</p>
+                `;
             };
             
             this.recognition.onresult = (event) => {
@@ -666,16 +882,43 @@ class ChatApp {
                 }
                 
                 this.voiceTranscript.textContent = finalTranscript + interimTranscript;
+                
+                // Auto-stop after 10 seconds of silence
+                if (finalTranscript.length > 0) {
+                    clearTimeout(this.autoStopTimeout);
+                    this.autoStopTimeout = setTimeout(() => {
+                        if (this.isRecording) {
+                            this.stopVoiceRecording();
+                        }
+                    }, 10000);
+                }
             };
             
             this.recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
+                let errorMessage = 'Voice recognition error. ';
+                switch(event.error) {
+                    case 'no-speech':
+                        errorMessage += 'No speech detected.';
+                        break;
+                    case 'audio-capture':
+                        errorMessage += 'Audio capture failed.';
+                        break;
+                    case 'not-allowed':
+                        errorMessage += 'Microphone access denied.';
+                        break;
+                    default:
+                        errorMessage += 'Please try again.';
+                }
+                this.voiceStatus.innerHTML = `<p style="color: var(--danger);">${errorMessage}</p>`;
                 this.stopRecording();
             };
             
             this.recognition.onend = () => {
                 this.stopRecording();
             };
+        } else {
+            console.warn('Speech recognition not supported');
         }
     }
 
@@ -687,7 +930,17 @@ class ChatApp {
         this.startVoiceBtn.classList.remove('recording');
         this.stopVoiceBtn.disabled = true;
         this.startVoiceBtn.disabled = false;
-        this.voiceStatus.innerHTML = '<i class="fas fa-microphone-slash"></i><p>Click the microphone to start recording</p>';
+        this.voiceStatus.innerHTML = `
+            <div class="voice-visualizer">
+                <div class="voice-wave"></div>
+                <div class="voice-wave"></div>
+                <div class="voice-wave"></div>
+            </div>
+            <p>Click the microphone to start recording</p>
+        `;
+        if (this.autoStopTimeout) {
+            clearTimeout(this.autoStopTimeout);
+        }
     }
 
     // Enhanced message display with timestamps
@@ -715,7 +968,7 @@ class ChatApp {
         
         const authorSpan = document.createElement('span');
         authorSpan.className = 'message-author';
-        authorSpan.textContent = type === 'user' ? 'You' : 'AI Assistant';
+        authorSpan.textContent = type === 'user' ? 'You' : 'ACF';
         
         const timeSpan = document.createElement('span');
         timeSpan.className = 'message-time';
@@ -825,16 +1078,17 @@ class ChatApp {
         // Build enhanced context from recent messages (last 15 messages for better context)
         const recentMessages = this.messages.slice(-15);
         const context = recentMessages.map(msg => 
-            `${msg.type === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
+            `${msg.type === 'user' ? 'User' : 'ACF'}: ${msg.content}`
         ).join('\n');
         
         // Add conversation metadata for better AI understanding
         const conversationMetadata = `
 Conversation Context:
+- AI Name: ACF
 - Total messages: ${this.messages.length}
 - Current conversation ID: ${this.conversationId}
 - User's message count: ${this.messages.filter(m => m.type === 'user').length}
-- AI's response count: ${this.messages.filter(m => m.type === 'assistant').length}
+- ACF's response count: ${this.messages.filter(m => m.type === 'assistant').length}
         `.trim();
         
         const fullMessage = context ? 
@@ -887,7 +1141,7 @@ Conversation Context:
         
         const authorSpan = document.createElement('span');
         authorSpan.className = 'message-author';
-        authorSpan.textContent = 'AI Assistant';
+        authorSpan.textContent = 'ACF';
         
         const textDiv = document.createElement('div');
         textDiv.className = 'message-text';
@@ -932,10 +1186,10 @@ Conversation Context:
                     </div>
                     <div class="message-content">
                         <div class="message-header">
-                            <span class="message-author">AI Assistant</span>
+                            <span class="message-author">ACF</span>
                         </div>
                         <div class="message-text">
-                            <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
+                            <p>Hello! I'm ACF, your AI assistant. How can I help you today?</p>
                         </div>
                     </div>
                 </div>
@@ -983,10 +1237,10 @@ Conversation Context:
                 </div>
                 <div class="message-content">
                     <div class="message-header">
-                        <span class="message-author">AI Assistant</span>
+                        <span class="message-author">ACF</span>
                     </div>
                     <div class="message-text">
-                        <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
+                        <p>Hello! I'm ACF, your AI assistant. How can I help you today?</p>
                     </div>
                 </div>
             </div>
@@ -1130,10 +1384,10 @@ Conversation Context:
                     </div>
                     <div class="message-content">
                         <div class="message-header">
-                            <span class="message-author">AI Assistant</span>
+                            <span class="message-author">ACF</span>
                         </div>
                         <div class="message-text">
-                            <p>Hello! I'm your AI assistant powered by Google Gemini. How can I help you today?</p>
+                            <p>Hello! I'm ACF, your AI assistant. How can I help you today?</p>
                         </div>
                     </div>
                 </div>
@@ -1230,6 +1484,13 @@ Conversation Context:
             
             // Show file preview
             this.showFilePreview(file);
+            
+            // Show success message
+            this.showFileUploadSuccess(file);
+        };
+        
+        reader.onerror = () => {
+            this.showFileUploadError(file);
         };
         
         if (file.type.startsWith('text/') || file.type === 'application/pdf') {
@@ -1239,6 +1500,40 @@ Conversation Context:
         } else {
             reader.readAsText(file);
         }
+    }
+
+    showFileUploadSuccess(file) {
+        const notification = document.createElement('div');
+        notification.className = 'file-upload-notification success';
+        notification.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <span>Successfully uploaded: ${file.name}</span>
+            <button onclick="this.parentElement.remove()">×</button>
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    showFileUploadError(file) {
+        const notification = document.createElement('div');
+        notification.className = 'file-upload-notification error';
+        notification.innerHTML = `
+            <i class="fas fa-exclamation-circle"></i>
+            <span>Failed to upload: ${file.name}</span>
+            <button onclick="this.parentElement.remove()">×</button>
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
     }
 
     formatFileSize(bytes) {
@@ -1328,7 +1623,7 @@ Conversation Context:
         const size = this.imageSize.value;
         
         if (!prompt) {
-            alert('Please enter a description for the image.');
+            this.showImageResult('❌ Please enter a description for the image.', 'error');
             return;
         }
         
@@ -1336,12 +1631,11 @@ Conversation Context:
         this.generateImageBtn.innerHTML = '<span class="loading"></span> Generating...';
         
         try {
-            // This would integrate with an image generation API
-            // For now, we'll simulate the process
+            // Simulate image generation with better feedback
             await this.simulateImageGeneration(prompt, style, size);
         } catch (error) {
             console.error('Image generation error:', error);
-            alert('Failed to generate image. Please try again.');
+            this.showImageResult('❌ Failed to generate image. Please try again.', 'error');
         } finally {
             this.generateImageBtn.disabled = false;
             this.generateImageBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Image';
@@ -1349,20 +1643,69 @@ Conversation Context:
     }
 
     async simulateImageGeneration(prompt, style, size) {
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // Show progress
+        this.showImageResult('🔄 Generating image...', 'info');
         
-        // For demo purposes, show a placeholder
+        // Simulate API call delay with progress updates
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.showImageResult('🔄 Processing prompt...', 'info');
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.showImageResult('🔄 Applying style...', 'info');
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.showImageResult('🔄 Finalizing image...', 'info');
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Generate a more realistic simulation
+        const imageId = Math.random().toString(36).substr(2, 9);
+        const timestamp = new Date().toISOString();
+        
+        const result = `
+            <div class="generated-image">
+                <div class="image-preview">
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                        <span>Generated Image</span>
+                    </div>
+                </div>
+                <div class="image-details">
+                    <h4>Image Details</h4>
+                    <div class="detail-item">
+                        <strong>Prompt:</strong> "${prompt}"
+                    </div>
+                    <div class="detail-item">
+                        <strong>Style:</strong> ${style}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Size:</strong> ${size}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Generated:</strong> ${new Date().toLocaleString()}
+                    </div>
+                    <div class="detail-item">
+                        <strong>ID:</strong> ${imageId}
+                    </div>
+                </div>
+                <div class="image-actions">
+                    <button class="action-btn" onclick="this.parentElement.parentElement.querySelector('.image-placeholder').style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57)';">
+                        <i class="fas fa-palette"></i> Apply Style
+                    </button>
+                    <button class="action-btn" onclick="this.parentElement.parentElement.querySelector('.image-placeholder').style.transform = 'scale(1.1)'; setTimeout(() => { this.parentElement.parentElement.querySelector('.image-placeholder').style.transform = 'scale(1)'; }, 200);">
+                        <i class="fas fa-expand"></i> Preview
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        this.showImageResult(result, 'success');
+    }
+
+    showImageResult(content, type = 'info') {
         this.imageResult.innerHTML = `
-            <div style="color: #8e8ea0; padding: 2rem;">
-                <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                <p><strong>Generated Image:</strong></p>
-                <p>Prompt: "${prompt}"</p>
-                <p>Style: ${style}</p>
-                <p>Size: ${size}</p>
-                <p style="margin-top: 1rem; font-size: 0.9rem;">
-                    This is a simulation. In a real implementation, this would show the actual generated image.
-                </p>
+            <div class="image-result ${type}">
+                ${content}
             </div>
         `;
     }

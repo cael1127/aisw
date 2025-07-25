@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="-1">
     <meta name="theme-color" content="#0f0f23">
     <meta name="description" content="Advanced AI Chat with cutting-edge capabilities">
-    <title>Nexus AI - Advanced AI Assistant</title>
+    <title>ACF - Advanced AI Assistant</title>
     <link rel="stylesheet" href="styles.css?v=16">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
@@ -25,7 +25,7 @@
                     <div class="brand-logo">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h2 class="brand-name">Nexus AI</h2>
+                    <h2 class="brand-name">ACF</h2>
                 </div>
                 <div class="sidebar-actions">
                     <button class="action-btn primary" id="newChatBtn" title="New Chat">
@@ -47,21 +47,21 @@
                 </div>
             </nav>
 
-            <div class="sidebar-footer">
-                <div class="ai-status">
-                    <div class="status-indicator" id="aiStatus">
-                        <div class="status-dot"></div>
-                        <div class="status-ring"></div>
+                            <div class="sidebar-footer">
+                    <div class="ai-status">
+                        <div class="status-indicator" id="aiStatus">
+                            <div class="status-dot"></div>
+                            <div class="status-ring"></div>
+                        </div>
+                        <div class="status-info">
+                            <span class="status-text">ACF Online</span>
+                            <span class="status-model">Google Gemini</span>
+                        </div>
                     </div>
-                    <div class="status-info">
-                        <span class="status-text">AI Online</span>
-                        <span class="status-model">Gemini 1.5 Flash</span>
-                    </div>
+                    <button class="action-btn" id="settingsBtn" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
                 </div>
-                <button class="action-btn" id="settingsBtn" title="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
-            </div>
         </aside>
 
         <!-- Main Content Area -->
@@ -73,24 +73,16 @@
                         <i class="fas fa-bars"></i>
                     </button>
                     <div class="breadcrumb">
-                        <span class="breadcrumb-item">Nexus AI</span>
+                        <span class="breadcrumb-item">ACF</span>
                         <i class="fas fa-chevron-right"></i>
                         <span class="breadcrumb-item active">Chat</span>
                     </div>
                 </div>
 
                 <div class="header-center">
-                    <div class="model-selector">
-                        <div class="model-display">
-                            <i class="fas fa-robot"></i>
-                            <span id="currentModel">Gemini 1.5 Flash</span>
-                        </div>
-                        <select id="modelSelect" class="model-select" aria-label="Select AI Model">
-                            <option value="gemini">Gemini 1.5 Flash</option>
-                            <option value="gpt4">GPT-4 Turbo</option>
-                            <option value="claude">Claude 3.5 Sonnet</option>
-                            <option value="custom">Custom Model</option>
-                        </select>
+                    <div class="model-display">
+                        <i class="fas fa-robot"></i>
+                        <span>Powered by Google Gemini</span>
                     </div>
                 </div>
 
@@ -127,12 +119,12 @@
                         </div>
                         <div class="message-content">
                             <div class="message-header">
-                                <span class="message-author">Nexus AI</span>
+                                <span class="message-author">ACF</span>
                                 <span class="message-time" id="messageTime"></span>
                             </div>
                             <div class="message-text">
                                 <div class="welcome-content">
-                                    <h2>Welcome to Nexus AI</h2>
+                                    <h2>Welcome to ACF</h2>
                                     <p>Your advanced AI assistant with cutting-edge capabilities</p>
                                     
                                     <div class="capabilities-grid">
@@ -220,7 +212,7 @@
                             </div>
                             <textarea 
                                 id="userInput" 
-                                placeholder="Message Nexus AI... (or drag files here)"
+                                placeholder="Message ACF... (or drag files here)"
                                 rows="1"
                                 aria-label="Message input"
                             ></textarea>
@@ -233,7 +225,7 @@
                             <div class="input-stats" id="inputStats"></div>
                             <div class="input-hint">
                                 <i class="fas fa-info-circle"></i>
-                                <span>Nexus AI can make mistakes. Consider checking important information.</span>
+                                <span>ACF can make mistakes. Consider checking important information.</span>
                             </div>
                         </div>
                     </div>
@@ -405,12 +397,11 @@
                     <div class="settings-section">
                         <h4>AI Configuration</h4>
                         <div class="setting-item">
-                            <label for="defaultModel">Default Model</label>
-                            <select id="defaultModel">
-                                <option value="gemini">Gemini 1.5 Flash</option>
-                                <option value="gpt4">GPT-4</option>
-                                <option value="claude">Claude</option>
-                            </select>
+                            <label>AI Model</label>
+                            <div class="model-info">
+                                <i class="fas fa-robot"></i>
+                                <span>Google Gemini (Fixed)</span>
+                            </div>
                         </div>
                         <div class="setting-item">
                             <label for="responseLength">Response Length</label>
