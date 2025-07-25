@@ -150,6 +150,7 @@ class ChatApp {
     loadSettings() {
         const defaultSettings = {
             defaultModel: 'gemini',
+            currentModel: 'gemini',
             responseLength: 'medium',
             creativityLevel: 70,
             theme: 'dark',
@@ -174,6 +175,10 @@ class ChatApp {
         // Apply font size
         document.body.style.fontSize = this.settings.fontSize === 'small' ? '14px' : 
                                      this.settings.fontSize === 'large' ? '18px' : '16px';
+        
+        // Update current model
+        this.currentModel = this.settings.currentModel || 'gemini';
+        this.updateModelDisplay();
         
         // Update UI elements
         if (this.defaultModel) this.defaultModel.value = this.settings.defaultModel;
@@ -293,6 +298,7 @@ class ChatApp {
             this.modelSelect.addEventListener('change', (e) => {
                 this.currentModel = e.target.value;
                 this.updateModelDisplay();
+                this.saveSettings();
             });
         }
 
@@ -333,6 +339,9 @@ class ChatApp {
         if (this.imageGenBtn) {
             this.imageGenBtn.addEventListener('click', () => this.openImageModal());
         }
+        if (this.generateImageBtn) {
+            this.generateImageBtn.addEventListener('click', () => this.generateImage());
+        }
 
         // Modal controls
         this.setupModalControls();
@@ -357,6 +366,31 @@ class ChatApp {
 
         // Drag and drop for files
         this.setupDragAndDrop();
+    }
+
+    setupDragAndDrop() {
+        const inputContainer = document.querySelector('.input-container');
+        if (!inputContainer) return;
+
+        inputContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            inputContainer.classList.add('drag-over');
+        });
+
+        inputContainer.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            inputContainer.classList.remove('drag-over');
+        });
+
+        inputContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            inputContainer.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                this.handleFiles(files);
+            }
+        });
     }
 
     setupModalControls() {
@@ -421,6 +455,16 @@ class ChatApp {
                 });
             }
         });
+        
+        // Add model selector to settings
+        if (this.modelSelect) {
+            this.modelSelect.addEventListener('change', (e) => {
+                this.settings.currentModel = e.target.value;
+                this.currentModel = e.target.value;
+                this.saveSettings();
+                this.updateModelDisplay();
+            });
+        }
 
         if (this.creativityLevel) {
             this.creativityLevel.addEventListener('input', (e) => {
@@ -567,12 +611,28 @@ class ChatApp {
     updateModelDisplay() {
         const modelNames = {
             'gemini': 'Gemini 1.5 Flash',
-            'gpt4': 'GPT-4',
-            'claude': 'Claude',
+            'gpt4': 'GPT-4 Turbo',
+            'claude': 'Claude 3.5 Sonnet',
             'custom': 'Custom Model'
         };
         
-        // Update any UI elements that show the current model
+        // Update UI elements that show the current model
+        const currentModelElement = document.getElementById('currentModel');
+        if (currentModelElement) {
+            currentModelElement.textContent = modelNames[this.currentModel];
+        }
+        
+        // Update model selector
+        if (this.modelSelect) {
+            this.modelSelect.value = this.currentModel;
+        }
+        
+        // Update status in sidebar
+        const statusModel = document.querySelector('.status-model');
+        if (statusModel) {
+            statusModel.textContent = modelNames[this.currentModel];
+        }
+        
         console.log(`Switched to: ${modelNames[this.currentModel]}`);
     }
 
@@ -736,6 +796,7 @@ class ChatApp {
 
         this.userInput.value = '';
         this.autoResizeTextarea();
+        this.updateInputStats();
 
         // Show typing indicator
         this.showTyping();
@@ -751,7 +812,7 @@ class ChatApp {
             this.renderConversationsList(); // Update sidebar
         } catch (error) {
             this.hideTyping();
-            const errorMessage = 'Sorry, I encountered an error. Please try again.';
+            const errorMessage = `Sorry, I encountered an error: ${error.message}. Please try again or switch to a different model.`;
             this.messages.push({ type: 'assistant', content: errorMessage, timestamp: Date.now() });
             this.displayMessage('assistant', errorMessage);
             this.saveConversationHistory();
@@ -787,7 +848,7 @@ Conversation Context:
             },
             body: JSON.stringify({
                 message: fullMessage,
-                apiType: 'gemini'
+                apiType: this.currentModel
             })
         });
 
@@ -808,6 +869,7 @@ Conversation Context:
     showTyping() {
         this.isLoading = true;
         this.sendButton.disabled = true;
+        this.sendButton.innerHTML = '<span class="loading"></span>';
         
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message assistant typing';
@@ -846,6 +908,7 @@ Conversation Context:
     hideTyping() {
         this.isLoading = false;
         this.sendButton.disabled = false;
+        this.sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
         
         const typingIndicator = document.getElementById('typing-indicator');
         if (typingIndicator) {
@@ -945,6 +1008,9 @@ Conversation Context:
         // Update UI
         this.renderConversationsList();
         this.closeSidebar();
+        
+        // Update conversation title in header
+        this.updateConversationTitle();
     }
 
     deleteConversation(conversationId, event) {
@@ -976,7 +1042,13 @@ Conversation Context:
         sortedConversations.forEach(conversation => {
             const conversationItem = document.createElement('div');
             conversationItem.className = `conversation-item ${conversation.id === this.conversationId ? 'active' : ''}`;
-            conversationItem.addEventListener('click', () => this.switchConversation(conversation.id));
+            conversationItem.setAttribute('data-conversation-id', conversation.id);
+            conversationItem.addEventListener('click', (e) => {
+                // Don't trigger if clicking delete button
+                if (!e.target.closest('.delete-btn')) {
+                    this.switchConversation(conversation.id);
+                }
+            });
             
             const title = document.createElement('div');
             title.className = 'conversation-title';
@@ -1099,6 +1171,17 @@ Conversation Context:
         return 'New Conversation';
     }
 
+    updateConversationTitle() {
+        const conversations = this.getStoredConversations();
+        const currentConversation = conversations[this.conversationId];
+        if (currentConversation) {
+            const breadcrumbItem = document.querySelector('.breadcrumb-item.active');
+            if (breadcrumbItem) {
+                breadcrumbItem.textContent = currentConversation.title || 'Chat';
+            }
+        }
+    }
+
     autoResizeTextarea() {
         this.userInput.style.height = 'auto';
         this.userInput.style.height = Math.min(this.userInput.scrollHeight, 200) + 'px';
@@ -1179,6 +1262,14 @@ Conversation Context:
     openVoiceModal() {
         this.voiceModal.classList.add('show');
         this.voiceTranscript.textContent = '';
+        
+        // Setup voice recording buttons
+        if (this.startVoiceBtn) {
+            this.startVoiceBtn.addEventListener('click', () => this.startVoiceRecording());
+        }
+        if (this.stopVoiceBtn) {
+            this.stopVoiceBtn.addEventListener('click', () => this.stopVoiceRecording());
+        }
     }
 
     closeVoiceModal() {
@@ -1196,9 +1287,14 @@ Conversation Context:
 
     startVoiceRecording() {
         if (this.recognition) {
-            this.recognition.start();
+            try {
+                this.recognition.start();
+            } catch (error) {
+                console.error('Voice recognition error:', error);
+                alert('Failed to start voice recording. Please try again.');
+            }
         } else {
-            alert('Speech recognition is not supported in your browser.');
+            alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
         }
     }
 
