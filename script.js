@@ -98,37 +98,9 @@ class ChatApp {
         this.runCodeBtn = document.getElementById('runCode');
         this.formatCodeBtn = document.getElementById('formatCode');
         this.clearCodeBtn = document.getElementById('clearCode');
-        this.outputContent = document.getElementById('outputContent');
-        this.clearOutputBtn = document.getElementById('clearOutput');
         
-        // Settings elements
-        this.closeSettingsModal = document.getElementById('closeSettingsModal');
-        this.responseLength = document.getElementById('responseLength');
-        this.creativityLevel = document.getElementById('creativityLevel');
-        this.creativityValue = document.getElementById('creativityValue');
-        this.themeSelect = document.getElementById('themeSelect');
-        this.fontSize = document.getElementById('fontSize');
-        this.autoSave = document.getElementById('autoSave');
-        this.voiceEnabled = document.getElementById('voiceEnabled');
-        this.codeExecution = document.getElementById('codeExecution');
-        
-        // Collaboration elements
-        this.closeCollabModal = document.getElementById('closeCollabModal');
-        this.createSessionBtn = document.getElementById('createSession');
-        this.sessionCode = document.getElementById('sessionCode');
-        this.joinSessionBtn = document.getElementById('joinSession');
-        this.sessionsList = document.getElementById('sessionsList');
-        
-        // Voice recognition setup
-        this.recognition = null;
-        this.isRecording = false;
-        this.setupVoiceRecognition();
-        
-        // Advanced features setup
-        this.currentModel = 'gemini';
-        this.settings = this.loadSettings();
-        this.collaborationSessions = [];
-        this.setupAdvancedFeatures();
+        // Create scroll-to-bottom button
+        this.createScrollToBottomButton();
     }
 
     setupAdvancedFeatures() {
@@ -386,105 +358,70 @@ class ChatApp {
     }
 
     initializeEventListeners() {
+        // Basic event listeners
         this.sendButton.addEventListener('click', () => this.sendMessage());
-        this.userInput.addEventListener('keypress', (e) => {
+        this.userInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 this.sendMessage();
             }
         });
-
+        
         // Auto-resize textarea
         this.userInput.addEventListener('input', () => {
             this.autoResizeTextarea();
             this.updateInputStats();
         });
-
-        // Conversation controls
-        if (this.clearChatButton) {
-            this.clearChatButton.addEventListener('click', () => this.clearCurrentConversation());
-        }
-        if (this.exportChatButton) {
-            this.exportChatButton.addEventListener('click', () => this.exportConversation());
-        }
-
-        // New chat button
-        if (this.newChatBtn) {
-            this.newChatBtn.addEventListener('click', () => this.createNewChat());
-        }
-
+        
         // Sidebar toggle
-        if (this.sidebarToggle) {
-            this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
-        }
-
-        // Model is fixed to Gemini
-        this.currentModel = 'gemini';
-
-        // Advanced feature buttons
-        if (this.codeExecBtn) {
-            this.codeExecBtn.addEventListener('click', () => this.openCodeModal());
-        }
-        if (this.settingsBtn) {
-            this.settingsBtn.addEventListener('click', () => this.openSettingsModal());
-        }
-        if (this.collabBtn) {
-            this.collabBtn.addEventListener('click', () => this.openCollabModal());
-        }
-        if (this.codeBtn) {
-            this.codeBtn.addEventListener('click', () => this.openCodeModal());
-        }
-        if (this.dataBtn) {
-            this.dataBtn.addEventListener('click', () => this.openDataAnalysis());
-        }
-
-        // File upload functionality
-        if (this.fileUploadBtn) {
-            this.fileUploadBtn.addEventListener('click', () => this.fileInput.click());
-        }
-        if (this.fileInput) {
-            this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-        }
-
-        // Voice input functionality
-        if (this.voiceBtn) {
-            this.voiceBtn.addEventListener('click', () => this.openVoiceModal());
-        }
-        if (this.voiceInputBtn) {
-            this.voiceInputBtn.addEventListener('click', () => this.openVoiceModal());
-        }
-
-        // Image generation functionality
-        if (this.imageGenBtn) {
-            this.imageGenBtn.addEventListener('click', () => this.openImageModal());
-        }
-        if (this.generateImageBtn) {
-            this.generateImageBtn.addEventListener('click', () => this.generateImage());
-        }
-
-        // Modal controls
-        this.setupModalControls();
-
-        // Code execution controls
-        this.setupCodeControls();
-
-        // Settings controls
-        this.setupSettingsControls();
-
-        // Collaboration controls
-        this.setupCollaborationControls();
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && 
-                !this.sidebar.contains(e.target) && 
-                !this.sidebarToggle.contains(e.target)) {
-                this.closeSidebar();
-            }
+        this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+        
+        // Clear chat
+        this.clearChatButton.addEventListener('click', () => this.clearCurrentConversation());
+        
+        // Export chat
+        this.exportChatButton.addEventListener('click', () => this.exportConversation());
+        
+        // New chat
+        this.newChatBtn.addEventListener('click', () => this.createNewChat());
+        
+        // File upload
+        this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        this.fileUploadBtn.addEventListener('click', () => this.fileInput.click());
+        
+        // Voice recording
+        this.voiceBtn.addEventListener('click', () => this.openVoiceModal());
+        this.voiceInputBtn.addEventListener('click', () => this.openVoiceModal());
+        
+        // Image generation
+        this.imageGenBtn.addEventListener('click', () => this.openImageModal());
+        
+        // Advanced features
+        this.codeExecBtn.addEventListener('click', () => this.openCodeModal());
+        this.settingsBtn.addEventListener('click', () => this.openSettingsModal());
+        this.collabBtn.addEventListener('click', () => this.openCollabModal());
+        this.codeBtn.addEventListener('click', () => this.openCodeModal());
+        this.dataBtn.addEventListener('click', () => this.openDataAnalysis());
+        
+        // Scroll event listener for scroll-to-bottom button
+        this.messagesContainer.addEventListener('scroll', () => {
+            this.handleScroll();
         });
-
-        // Drag and drop for files
+        
+        // Setup drag and drop
         this.setupDragAndDrop();
+        
+        // Setup modal controls
+        this.setupModalControls();
+        
+        // Setup code controls
+        this.setupCodeControls();
+        
+        // Setup settings controls
+        this.setupSettingsControls();
+        
+        // Setup collaboration controls
+        this.setupCollaborationControls();
     }
 
     setupDragAndDrop() {
@@ -1171,7 +1108,17 @@ Conversation Context:
     }
 
     scrollToBottom() {
-        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        // Use requestAnimationFrame to ensure DOM is updated
+        requestAnimationFrame(() => {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            
+            // Additional scroll check to ensure it worked
+            setTimeout(() => {
+                if (this.messagesContainer.scrollTop + this.messagesContainer.clientHeight < this.messagesContainer.scrollHeight) {
+                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+                }
+            }, 100);
+        });
     }
 
     // Memory utility functions
@@ -1281,7 +1228,7 @@ Conversation Context:
                 this.createNewChat();
             } else {
                 // Just update the list without reordering
-                this.updateConversationsList();
+                this.renderConversationsList();
             }
         }
     }
@@ -1474,16 +1421,47 @@ Conversation Context:
     processFile(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            const content = e.target.result;
+            let content = '';
             const fileInfo = `📁 **File Uploaded:** ${file.name} (${this.formatFileSize(file.size)})\n\n`;
             
+            if (file.type.startsWith('image/')) {
+                // For images, just show the file info and a preview, not the base64 data
+                content = fileInfo + `[Image file uploaded: ${file.name}]\n\nYou can reference this image in your message.`;
+                
+                // Create a preview element
+                const preview = document.createElement('div');
+                preview.className = 'file-preview-image';
+                preview.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${this.formatFileSize(file.size)}</div>
+                    </div>
+                    <div class="image-preview-container">
+                        <img src="${e.target.result}" alt="${file.name}" style="max-width: 200px; max-height: 150px; border-radius: 8px;">
+                    </div>
+                    <button class="remove-file" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                // Insert before input field
+                this.userInput.parentElement.parentElement.insertBefore(preview, this.userInput.parentElement);
+            } else if (file.type.startsWith('text/') || file.type === 'application/pdf') {
+                // For text files, show the content
+                const textContent = e.target.result;
+                // Limit the content to prevent overwhelming the input
+                const maxLength = 5000;
+                const truncatedContent = textContent.length > maxLength 
+                    ? textContent.substring(0, maxLength) + '\n\n[Content truncated - file is too large to display fully]'
+                    : textContent;
+                content = fileInfo + truncatedContent;
+            } else {
+                // For other file types, just show file info
+                content = fileInfo + `[File uploaded: ${file.name}]\n\nThis file has been uploaded and can be referenced in your message.`;
+            }
+            
             // Add file content to input
-            this.userInput.value = fileInfo + content;
+            this.userInput.value = content;
             this.autoResizeTextarea();
             this.updateInputStats();
-            
-            // Show file preview
-            this.showFilePreview(file);
             
             // Show success message
             this.showFileUploadSuccess(file);
@@ -1498,6 +1476,7 @@ Conversation Context:
         } else if (file.type.startsWith('image/')) {
             reader.readAsDataURL(file);
         } else {
+            // For other file types, try to read as text but handle gracefully
             reader.readAsText(file);
         }
     }
@@ -1708,6 +1687,47 @@ Conversation Context:
                 ${content}
             </div>
         `;
+    }
+
+    createScrollToBottomButton() {
+        const scrollButton = document.createElement('button');
+        scrollButton.className = 'scroll-to-bottom-btn';
+        scrollButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        scrollButton.style.position = 'fixed';
+        scrollButton.style.bottom = '20px';
+        scrollButton.style.right = '20px';
+        scrollButton.style.zIndex = '1000';
+        scrollButton.style.background = 'var(--primary)';
+        scrollButton.style.color = 'white';
+        scrollButton.style.borderRadius = '50%';
+        scrollButton.style.width = '50px';
+        scrollButton.style.height = '50px';
+        scrollButton.style.display = 'flex';
+        scrollButton.style.alignItems = 'center';
+        scrollButton.style.justifyContent = 'center';
+        scrollButton.style.cursor = 'pointer';
+        scrollButton.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+        scrollButton.style.opacity = '0.7';
+        scrollButton.style.transition = 'opacity 0.3s ease';
+
+        scrollButton.addEventListener('click', () => {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        });
+
+        document.body.appendChild(scrollButton);
+    }
+
+    handleScroll() {
+        const scrollButton = document.querySelector('.scroll-to-bottom-btn');
+        if (scrollButton) {
+            if (this.messagesContainer.scrollTop > 200) { // Show button when scrolled down
+                scrollButton.style.opacity = '1';
+                scrollButton.style.transform = 'scale(1)';
+            } else { // Hide button when scrolled up
+                scrollButton.style.opacity = '0.7';
+                scrollButton.style.transform = 'scale(0.9)';
+            }
+        }
     }
 }
 
